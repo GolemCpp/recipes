@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import distutils
 import subprocess
@@ -11,35 +12,23 @@ import glob
 def configure(project):
 
     project.dependency(name='boost',
-                       targets=['boost_system'],
-                       repository='ssh://git@git.balp.io/boost.git',
-                       version='master')
+                       targets=["boost_system"],
+                       repository='https://github.com/boostorg/boost.git',
+                       version='~1.69.0',
+                       variant='release',
+                       shallow=True)
 
-    target = project.export(name='bustache',
-                            targets=['bustache'],
-                            includes=['bustache/include'])
+    project.library(name='bustache', scripts=[script], deps=['boost'])
 
-    target.when(osystem=['linux'], system=['boost_system'])
-
-    target.when(osystem=['windows', 'osx'], deps=['boost'])
-
-
-def mycopy(src, dst):
-    if os.path.isdir(dst):
-        dst = os.path.join(dst, os.path.basename(src))
-    if os.path.islink(src):
-        linkto = os.readlink(src)
-        os.symlink(linkto, dst)
-    else:
-        shutil.copy(src, dst)
+    project.export(name='bustache',
+                   includes=['include'],
+                   deps=['boost'],
+                   licenses=['README.md'])
 
 
 def script(ctx):
 
-    boost_dep = ctx.find_dep('boost')
-    boost_dep_include = ctx.find_dep_cache_include(boost_dep)
-
-    bustache_dir = ctx.make_project_path(os.path.join('bustache'))
+    bustache_dir = ctx.get_project_dir()
 
     target_dir = ctx.context.out_dir
     if not os.path.exists(target_dir):
@@ -67,16 +56,17 @@ def script(ctx):
         else:
             opt_arch.append('x86')
 
-    boost_option = []
-    if not ctx.is_linux():
-        boost_option.append('-D' + 'Boost_INCLUDE_DIR=' + boost_dep_include)
+    boost_options = [
+        '-DBOOST_LIBRARYDIR=' + ctx.find_dependency_libraries('boost')[0],
+        '-DBOOST_INCLUDEDIR=' + ctx.find_dependency_includes('boost')[0],
+        '-DBoost_NO_SYSTEM_PATHS=ON'
+    ]
 
-    ret = subprocess.call(['cmake', bustache_dir] + boost_option + opt_arch +
+    ret = subprocess.call(['cmake', bustache_dir] + boost_options + opt_arch +
                           [opt_variant, opt_target],
                           cwd=target_dir)
     if ret:
-        print "ERROR: cmake"
-        return
+        raise RuntimeError("ERROR: cmake")
 
     ret = subprocess.call(
         ['cmake', '--build', '.', '--target', 'bustache', '--config', variant],
@@ -85,15 +75,4 @@ def script(ctx):
         raise RuntimeError("ERROR: cmake --build")
 
     out_path = ctx.make_out_path()
-    if os.path.exists(out_path):
-        shutil.rmtree(out_path)
-    os.makedirs(out_path)
-
-    types = ('*.pdb', '*.dll', '*.lib', '*.a', '*.so', '*.so.*')
-    files_grabbed = []
-    for files in types:
-        files_grabbed.extend(glob.glob(os.path.join(target_dir, files)))
-
-    for file in files_grabbed:
-        print(file)
-        mycopy(file, out_path)
+    ctx.copy_binary_artifacts(target_dir, out_path)

@@ -11,10 +11,10 @@ import os
 
 def configure(project):
     def shared_targets_decorator(target_name, config, context):
-        return target_name
+        return target_name + '-1.0'
 
     def static_targets_decorator(target_name, config, context):
-        return target_name + '-static'
+        return target_name + '-static-1.0'
 
     def artifacts_generator(decorated_target, config, context):
         artifacts = []
@@ -23,35 +23,32 @@ def configure(project):
                 config) + decorated_target + suffix
             artifacts.append(artifact)
             if suffix == '.so':
-                artifacts.append('{}.{}'.format(artifact, '_noabi'))
-                artifacts.append('{}.{}.{}.{}'.format(artifact,
-                                                      context.version.major,
-                                                      context.version.minor,
-                                                      context.version.patch))
+                artifacts.append('{}.{}'.format(artifact, 0))
+                artifacts.append('{}.{}.{}.{}'.format(artifact, 0, 0, 0))
         return artifacts
 
-    project.dependency(
-        name='mongo-c-driver',
-        repository='https://github.com/mongodb/mongo-c-driver.git',
-        version='~1.13.0',
-        variant='release',
-        shallow=True)
-
-    target = project.library(name='mongo-cxx-driver',
-                             targets=['bsoncxx', 'mongocxx'],
+    target = project.library(name='mongo-c-driver',
+                             targets=['bson', 'mongoc'],
                              scripts=[script],
-                             artifacts_generators=[artifacts_generator],
-                             deps=['mongo-c-driver'])
+                             artifacts_generators=[artifacts_generator])
 
     target.when(link=['shared'], target_decorators=[shared_targets_decorator])
     target.when(link=['static'], target_decorators=[static_targets_decorator])
 
-    target = project.export(name='mongo-cxx-driver',
+    target = project.export(name='mongo-c-driver',
                             includes=['include'],
-                            licenses=['LICENSE', 'THIRD-PARTY-NOTICES'],
-                            deps=['mongo-c-driver'])
+                            licenses=['COPYING', 'THIRD_PARTY_NOTICES'])
 
-    target.when(link=['static'], defines=['MONGOCXX_STATIC', 'BSONCXX_STATIC'])
+    target.when(link=['static'], defines=['MONGOC_STATIC', 'BSON_STATIC'])
+
+    target.when(link=['static'],
+                osystem=['linux'],
+                lib=["rt", "sasl2", "icuuc", "z", "resolv"])
+
+    target.when(link=['static'],
+                osystem=['osx'],
+                lib=["sasl2", "z", "resolv"],
+                framework=['CoreFoundation', 'Security'])
 
 
 def make_install_path(ctx):
@@ -63,18 +60,9 @@ def make_install_path(ctx):
     return prefix_dir
 
 
-def make_cmake_prefix(ctx):
-    mongoc_out_path = ctx.find_dependency_libraries('mongo-c-driver')[0]
-    install_folder = os.path.basename(mongoc_out_path) + "-install"
-    prefix_dir = os.path.join(os.path.dirname(mongoc_out_path), install_folder)
-    if not os.path.exists(prefix_dir):
-        os.makedirs(prefix_dir)
-    return prefix_dir
+def build_mongoc(ctx):
 
-
-def build_mongocxx(ctx):
-
-    mongocxx_dir = ctx.get_project_dir()
+    mongoc_dir = ctx.get_project_dir()
 
     target_dir = ctx.context.out_dir
     if not os.path.exists(target_dir):
@@ -88,11 +76,11 @@ def build_mongocxx(ctx):
 
     opt_variant = '-DCMAKE_BUILD_TYPE=' + variant
 
-    opt_target = '-DBUILD_SHARED_LIBS='
+    opt_target = '-DENABLE_STATIC='
     if ctx.is_static():
-        opt_target += 'OFF'
-    else:
         opt_target += 'ON'
+    else:
+        opt_target += 'OFF'
 
     opt_arch = ['-A']
     if ctx.is_x64():
@@ -104,16 +92,12 @@ def build_mongocxx(ctx):
         opt_arch = []
 
     prefix_dir = make_install_path(ctx)
-    mongoc_out_path = make_cmake_prefix(ctx)
 
     prefix_path = '-DCMAKE_INSTALL_PREFIX=' + prefix_dir
 
-    prefix_path_bis = '-DCMAKE_PREFIX_PATH=' + mongoc_out_path
-
-    ret = subprocess.call(['cmake', mongocxx_dir] + opt_arch + [
+    ret = subprocess.call(['cmake', mongoc_dir] + opt_arch + [
         opt_variant, opt_target, '-DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF',
-        '-DENABLE_EXAMPLES=OFF', '-DENABLE_TESTS=OFF', prefix_path_bis,
-        prefix_path
+        '-DENABLE_EXAMPLES=OFF', '-DENABLE_TESTS=OFF', prefix_path
     ],
                           cwd=target_dir)
     if ret:
@@ -131,7 +115,7 @@ def build_mongocxx(ctx):
 
 def script(ctx):
 
-    build_mongocxx(ctx)
+    build_mongoc(ctx)
 
     prefix_dir = make_install_path(ctx)
 
@@ -141,13 +125,12 @@ def script(ctx):
     include_dir = ctx.make_project_path('include')
     os.makedirs(include_dir)
 
-    distutils.dir_util.copy_tree(os.path.join(prefix_dir, 'include', 'bsoncxx',
-                                              'v_noabi', 'bsoncxx'),
-                                 os.path.join(include_dir, 'bsoncxx'),
+    distutils.dir_util.copy_tree(os.path.join(prefix_dir, 'include',
+                                              'libbson-1.0', 'bson'),
+                                 os.path.join(include_dir, 'bson'),
                                  preserve_symlinks=1)
 
     distutils.dir_util.copy_tree(os.path.join(prefix_dir, 'include',
-                                              'mongocxx', 'v_noabi',
-                                              'mongocxx'),
-                                 os.path.join(include_dir, 'mongocxx'),
+                                              'libmongoc-1.0', 'mongoc'),
+                                 os.path.join(include_dir, 'mongoc'),
                                  preserve_symlinks=1)
