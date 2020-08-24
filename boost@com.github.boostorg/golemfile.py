@@ -58,9 +58,10 @@ def script(ctx):
 
     boost_dir = ctx.get_project_dir()
 
-    bootstrap_bin = 'bootstrap.bat' if ctx.is_windows() else './bootstrap.sh'
+    bootstrap_bin = ctx.msvc_vcvars_cmd() + 'bootstrap.bat' if ctx.is_windows(
+    ) else './bootstrap.sh'
 
-    ret = subprocess.call([bootstrap_bin], cwd=boost_dir, shell=True)
+    ret = subprocess.call(bootstrap_bin, cwd=boost_dir, shell=True)
     if ret:
         raise RuntimeError("ERROR: " + bootstrap_bin)
 
