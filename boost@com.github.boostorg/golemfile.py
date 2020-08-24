@@ -81,37 +81,7 @@ def script(ctx):
     opt_link = 'link=' + ctx.link()
 
     opt_libs = []
-    opt_libs.append('--with-system')
-    opt_libs.append('--with-atomic')
-    opt_libs.append('--with-chrono')
-    opt_libs.append('--with-container')
-    opt_libs.append('--with-context')
-    opt_libs.append('--with-coroutine')
-    opt_libs.append('--with-date_time')
-    opt_libs.append('--with-exception')
-    opt_libs.append('--with-fiber')
-    opt_libs.append('--with-filesystem')
-    opt_libs.append('--with-graph')
-    opt_libs.append('--with-graph_parallel')
-    opt_libs.append('--with-iostreams')
-    opt_libs.append('--with-locale')
-    opt_libs.append('--with-log')
-    opt_libs.append('--with-math')
-    opt_libs.append('--with-mpi')
-    opt_libs.append('--with-program_options')
-    #	opt_libs.append('--with-python')
-    opt_libs.append('--with-random')
-    opt_libs.append('--with-regex')
-    opt_libs.append('--with-serialization')
-    if not ctx.is_windows():
-        opt_libs.append('--with-signals')
-    opt_libs.append('--with-stacktrace')
-    opt_libs.append('--with-system')
-    opt_libs.append('--with-test')
-    opt_libs.append('--with-thread')
-    opt_libs.append('--with-timer')
-    opt_libs.append('--with-type_erasure')
-    opt_libs.append('--with-wave')
+    opt_libs.append('--without-python')
 
     opt_headers = []
     if not ctx.is_windows():
