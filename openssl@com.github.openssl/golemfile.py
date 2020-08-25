@@ -12,8 +12,13 @@ def configure(project):
     def artifacts_generator(decorated_target, config, context):
         artifacts = []
         for suffix in context.artifact_suffix(config):
-            artifact = context.artifact_prefix(
-                config) + decorated_target + suffix
+            artifact = context.artifact_prefix(config) + decorated_target
+            if suffix in ['.dll', '.pdb']:
+                artifact = '{}-{}_{}-{}'.format(artifact,
+                                                context.version.major,
+                                                context.version.minor,
+                                                context.get_arch())
+            artifact += suffix
             artifacts.append(artifact)
             if suffix == '.so':
                 artifacts.append('{}.{}.{}'.format(artifact,
@@ -98,7 +103,7 @@ def script(ctx):
         if ret.returncode:
             print("ERROR: " + ' '.join(cmd))
             return -1
-        lines = out.splitlines()
+        lines = out.decode(sys.stdout.encoding).splitlines()
         if not lines[0]:
             return 1
         msvc_path = lines[0]
