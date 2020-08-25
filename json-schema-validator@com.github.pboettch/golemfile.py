@@ -54,9 +54,14 @@ def script(ctx):
 
     source_path = ctx.get_project_dir()
 
+    cmake_options = ['-Dnlohmann_json_DIR=' + json_include]
+
+    if ctx.is_windows():
+        cmake_options.append('-DCMAKE_CXX_FLAGS=/std:c++17')
+
     ctx.cmake_build(source_path=source_path,
                     targets=['nlohmann_json_schema_validator'],
-                    options=['-Dnlohmann_json_DIR=' + json_include])
+                    options=cmake_options)
 
     ctx.export_binaries(recursively=True)
 
