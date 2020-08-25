@@ -6,11 +6,54 @@ import subprocess
 
 
 def configure(project):
-    project.library(name='zlib', targets=['z'], scripts=[script])
-    project.export(name='zlib', includes=['include'], licenses=['README'])
+    def target_decorator(target_name, config, context):
+        if context.compiler_name() == 'msvc':
+            result = target_name
+            result += 'libstat' if context.is_static() else 'libwapi'
+            return result
+        return target_name
+
+    project.library(name='zlib',
+                    targets=['z'],
+                    scripts=[script],
+                    target_decorators=[target_decorator])
+
+    target = project.export(name='zlib',
+                            includes=['include'],
+                            licenses=['README'])
+
+    target.when(osystem=['windows'], link=['shared'], defines=['ZLIB_WINAPI'])
 
 
-def script(ctx):
+def build_msvc(ctx):
+
+    repo_dir = ctx.get_project_dir()
+
+    build_dir = ctx.context.out_dir
+    if not os.path.exists(build_dir):
+        os.makedirs(build_dir)
+
+    project_path = os.path.join(repo_dir, 'contrib', 'vstudio', 'vc14')
+    build_path = project_path
+
+    if ctx.is_static():
+        project_path = os.path.join(project_path, 'zlibstat.vcxproj')
+        build_path = os.path.join(
+            build_path, ctx.get_arch(),
+            'ZlibStat' + ('Release' if ctx.is_release() else 'Debug'))
+    else:
+        project_path = os.path.join(project_path, 'zlibvc.vcxproj')
+        build_path = os.path.join(
+            build_path, ctx.get_arch(),
+            'ZlibDll' + ('Release' if ctx.is_release() else 'Debug'))
+
+    ctx.run_msbuild_command(project_path=project_path)
+
+    out_path = ctx.make_out_path()
+    ctx.copy_binary_artifacts(build_path, out_path)
+
+
+def build_gcc(ctx):
 
     repo_dir = ctx.get_project_dir()
 
@@ -28,6 +71,16 @@ def script(ctx):
 
     out_path = ctx.make_out_path()
     ctx.copy_binary_artifacts(repo_dir, out_path)
+
+
+def script(ctx):
+
+    if ctx.compiler_name() == 'msvc':
+        build_msvc(ctx)
+    else:
+        build_gcc(ctx)
+
+    repo_dir = ctx.get_project_dir()
 
     include_dir = os.path.join(repo_dir, 'include')
     if os.path.exists(include_dir):

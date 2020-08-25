@@ -85,7 +85,8 @@ def script(ctx):
 
     opt_libs = []
     opt_libs.append('--prefix=' + os.path.join(openssl_dir, 'output'))
-    opt_libs.append('--openssldir=' + os.path.join(openssl_dir, 'output'))
+    opt_libs.append('--openssldir=' +
+                    ('/etc/ssl' if ctx.is_linux() else 'ssl'))
 
     openssl_config_args = ['no-asm', 'enable-static-engine', opt_variant]
 

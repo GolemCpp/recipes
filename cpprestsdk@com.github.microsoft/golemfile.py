@@ -26,6 +26,10 @@ def configure(project):
                        variant="release",
                        shallow=True)
 
+    def target_decorator(target_name, config, context):
+        return target_name if not context.is_windows() else '{}_{}_{}'.format(
+            target_name, context.version.major, context.version.minor)
+
     def artifacts_generator(decorated_target, config, context):
         artifacts = []
         for suffix in context.artifact_suffix(config):
@@ -41,11 +45,13 @@ def configure(project):
     project.library(name='cpprest',
                     deps=['boost', 'openssl', 'zlib'],
                     scripts=[script],
+                    target_decorators=[target_decorator],
                     artifacts_generators=[artifacts_generator])
 
     project.export(name='cpprest',
                    includes=['Release/include'],
-                   licenses=['license.txt', 'ThirdPartyNotices.txt'])
+                   licenses=['license.txt', 'ThirdPartyNotices.txt'],
+                   deps=['boost', 'openssl', 'zlib'])
 
 
 import os
@@ -87,20 +93,23 @@ def script(ctx):
         opt_arch = []
 
     opt_deps = []
-    if ctx.is_linux():
-        opt_deps += [
-            '-DBOOST_LIBRARYDIR=' + ctx.find_dependency_libraries('boost')[0],
-            '-DBOOST_INCLUDEDIR=' + ctx.find_dependency_includes('boost')[0],
-            '-DBoost_NO_SYSTEM_PATHS=ON', '-DZLIB_LIBRARY=' +
-            os.path.join(ctx.find_dependency_libraries('zlib')[0], 'libz.so'),
-            '-DZLIB_INCLUDE_DIRS=' + ctx.find_dependency_includes('zlib')[0],
-            '-DOPENSSL_CRYPTO_LIBRARY=' + os.path.join(
-                ctx.find_dependency_libraries('openssl')[0], 'libcrypto.so'),
-            '-DOPENSSL_SSL_LIBRARY=' + os.path.join(
-                ctx.find_dependency_libraries('openssl')[0], 'libssl.so'),
-            '-DOPENSSL_INCLUDE_DIR=' +
-            ctx.find_dependency_includes('openssl')[0], '-DWERROR=OFF'
-        ]
+
+    zlib_libs = ctx.find_dependency_libraries_files(dep_name='zlib',
+                                                    target_name='z')
+    crypto_libs = ctx.find_dependency_libraries_files(dep_name='openssl',
+                                                      target_name='crypto')
+    ssl_libs = ctx.find_dependency_libraries_files(dep_name='openssl',
+                                                   target_name='ssl')
+    opt_deps += [
+        '-DBOOST_LIBRARYDIR=' + ctx.find_dependency_libraries('boost')[0],
+        '-DBOOST_INCLUDEDIR=' + ctx.find_dependency_includes('boost')[0],
+        '-DBoost_NO_SYSTEM_PATHS=ON', '-DZLIB_LIBRARY=' + zlib_libs[0],
+        '-DZLIB_INCLUDE_DIR=' + ctx.find_dependency_includes('zlib')[0],
+        '-DOPENSSL_CRYPTO_LIBRARY=' + crypto_libs[0],
+        '-DOPENSSL_SSL_LIBRARY=' + ssl_libs[0],
+        '-DOPENSSL_INCLUDE_DIR=' + ctx.find_dependency_includes('openssl')[0],
+        '-DWERROR=OFF'
+    ]
 
     command = ['cmake', cpprest_dir] + opt_arch + [
         opt_variant, opt_target, '-DCPPREST_EXCLUDE_WEBSOCKETS=1',
@@ -120,6 +129,12 @@ def script(ctx):
         raise RuntimeError("ERROR: cmake --build")
 
     out_path = ctx.make_out_path()
-    distutils.dir_util.copy_tree(os.path.join(ctx.context.out_dir, 'Binaries'),
+
+    binaries_directory = os.path.join(ctx.context.out_dir, 'Binaries')
+
+    if ctx.is_windows():
+        binaries_directory = os.path.join(binaries_directory, 'Release')
+
+    distutils.dir_util.copy_tree(binaries_directory,
                                  out_path,
                                  preserve_symlinks=1)
