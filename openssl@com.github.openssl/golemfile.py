@@ -9,6 +9,9 @@ import os
 
 
 def configure(project):
+    def target_decorator(target_name, config, context):
+        return 'lib' + target_name if context.is_windows() else target_name
+
     def artifacts_generator(decorated_target, config, context):
         artifacts = []
         for suffix in context.artifact_suffix(config):
@@ -29,6 +32,7 @@ def configure(project):
     project.library(name='openssl',
                     targets=['crypto', 'ssl'],
                     scripts=[script],
+                    target_decorators=[target_decorator],
                     artifacts_generators=[artifacts_generator])
 
     project.export(name='openssl',

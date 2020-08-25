@@ -23,9 +23,6 @@ def configure(project):
         'boost_unit_test_framework', 'boost_wave', 'boost_wserialization'
     ]
 
-    def target_decorator(target_name, config, context):
-        return target_name
-
     def artifacts_generator(decorated_target, config, context):
         artifacts = []
         for suffix in context.artifact_suffix(config):
@@ -40,7 +37,6 @@ def configure(project):
     project.library(name='boost',
                     targets=targets,
                     scripts=[script],
-                    target_decorators=[target_decorator],
                     artifacts_generators=[artifacts_generator])
 
     project.export(name='boost',
