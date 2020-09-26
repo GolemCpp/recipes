@@ -193,12 +193,9 @@ def script(ctx):
         return
 
     out_path = ctx.make_out_path()
-    if os.path.exists(out_path):
-        shutil.rmtree(out_path)
-    os.makedirs(out_path)
 
     if ctx.is_linux():
-        distutils.dir_util.copy_tree(
+        ctx.copy_binary_artifacts(
             os.path.join(cinder_dir, 'lib', 'linux', 'x86_64', 'ogl', variant),
             out_path)
 
@@ -209,9 +206,7 @@ def script(ctx):
         for path in full_paths:
             if os.path.basename(os.path.normpath(path)).startswith(
                     'v') and os.path.isdir(path):
-                distutils.dir_util.copy_tree(path,
-                                             out_path,
-                                             preserve_symlinks=1)
+                ctx.copy_binary_artifacts(path, out_path)
 
         path = os.path.join(target_dir, variant)
-        distutils.dir_util.copy_tree(path, out_path, preserve_symlinks=1)
+        ctx.copy_binary_artifacts(path, out_path)

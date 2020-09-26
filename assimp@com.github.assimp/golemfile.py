@@ -68,51 +68,35 @@ def script(ctx):
 
     cmd = ['cmake', assimp_dir] + [opt_variant, opt_target
                                    ] + opt_linux + opt_windows
-    print cmd
+    print(cmd)
     ret = subprocess.call(cmd, cwd=target_dir)
     if ret:
         print "ERROR: cmake"
         return
 
     cmd = ['cmake', '--build', '.', '--config', variant]
-    print cmd
+    print(cmd)
     ret = subprocess.call(cmd, cwd=target_dir)
     if ret:
         print "ERROR: cmake --build"
         return
 
     out_path = ctx.make_out_path()
-    if os.path.exists(out_path):
-        shutil.rmtree(out_path)
-    os.makedirs(out_path)
-
-    if ctx.is_windows():
-        types = ('*.pdb', '*.dll', '*.lib')
-    else:
-        types = ('*.so*', '*.a')
 
     code_path = os.path.join(target_dir, 'code')
     irrxml_path = os.path.join(target_dir, 'contrib', 'irrXML')
     zlib_path = os.path.join(target_dir, 'contrib', 'zlib')
+
     if ctx.is_windows():
         code_path = os.path.join(code_path, variant)
         irrxml_path = os.path.join(irrxml_path, variant)
         zlib_path = os.path.join(zlib_path, variant)
 
-    files_grabbed = []
-    for files in types:
-        files_grabbed.extend(glob.glob(os.path.join(code_path, files)))
-
-    for files in types:
-        files_grabbed.extend(glob.glob(os.path.join(irrxml_path, files)))
+    ctx.copy_binary_artifacts(os.path.join(code_path), out_path)
+    ctx.copy_binary_artifacts(os.path.join(irrxml_path), out_path)
 
     if ctx.is_windows():
-        for files in types:
-            files_grabbed.extend(glob.glob(os.path.join(zlib_path, files)))
-
-    for file in files_grabbed:
-        print(file)
-        shutil.copy(file, out_path)
+        ctx.copy_binary_artifacts(os.path.join(zlib_path), out_path)
 
     distutils.dir_util.copy_tree(os.path.join(assimp_dir, 'include'),
                                  os.path.join(assimp_dir, '..', 'include'))

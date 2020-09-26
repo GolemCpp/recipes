@@ -135,6 +135,4 @@ def script(ctx):
     if ctx.is_windows():
         binaries_directory = os.path.join(binaries_directory, 'Release')
 
-    distutils.dir_util.copy_tree(binaries_directory,
-                                 out_path,
-                                 preserve_symlinks=1)
+    ctx.copy_binary_artifacts(binaries_directory, out_path)

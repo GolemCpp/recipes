@@ -103,19 +103,7 @@ def script(ctx):
         return 1
 
     out_path = ctx.make_out_path()
-    if os.path.exists(out_path):
-        shutil.rmtree(out_path)
-    os.makedirs(out_path)
-
-    types = ('*.pdb', '*.dll', '*.lib')
-    files_grabbed = []
-    for files in types:
-        files_grabbed.extend(
-            glob.glob(os.path.join(target_dir, variant_name, files)))
-
-    for file in files_grabbed:
-        print(file)
-        shutil.copy(file, out_path)
+    ctx.copy_binary_artifacts(os.path.join(target_dir, variant_name), out_path)
 
     include_src = os.path.join(sdl2_dir, 'include')
     include_dest = os.path.join(sdl2_dir, 'include', 'SDL2')
