@@ -27,6 +27,12 @@ def configure(project):
                 artifacts.append('{}.{}.{}'.format(artifact,
                                                    context.version.major,
                                                    context.version.minor))
+            elif suffix == '.dylib':
+                basename_prefix = context.artifact_prefix(
+                    config) + decorated_target
+                artifacts.append('{}.{}.{}.dylib'.format(
+                    basename_prefix, context.version.major,
+                    context.version.minor))
         return artifacts
 
     project.library(name='openssl',

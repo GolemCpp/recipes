@@ -21,6 +21,14 @@ def configure(project):
                                                       context.version.major,
                                                       context.version.minor,
                                                       context.version.patch))
+            elif suffix == '.dylib':
+                basename_prefix = context.artifact_prefix(
+                    config) + decorated_target
+                artifacts.append('{}.{}.dylib'.format(basename_prefix,
+                                                      context.version.minor))
+                artifacts.append('{}.{}.{}.{}.dylib'.format(
+                    basename_prefix, context.version.major,
+                    context.version.minor, context.version.patch))
         return artifacts
 
     project.dependency(name='json',

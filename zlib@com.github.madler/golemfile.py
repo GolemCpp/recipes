@@ -13,10 +13,34 @@ def configure(project):
             return result
         return target_name
 
+    def artifacts_generator(decorated_target, config, context):
+        artifacts = []
+        for suffix in context.artifact_suffix(config):
+            artifact = context.artifact_prefix(
+                config) + decorated_target + suffix
+            artifacts.append(artifact)
+            if suffix == '.so':
+                artifacts.append('{}.{}'.format(artifact,
+                                                context.version.major))
+                artifacts.append('{}.{}.{}.{}'.format(artifact,
+                                                      context.version.major,
+                                                      context.version.minor,
+                                                      context.version.patch))
+            elif suffix == '.dylib':
+                basename_prefix = context.artifact_prefix(
+                    config) + decorated_target
+                artifacts.append('{}.{}.dylib'.format(basename_prefix,
+                                                      context.version.major))
+                artifacts.append('{}.{}.{}.{}.dylib'.format(
+                    basename_prefix, context.version.major,
+                    context.version.minor, context.version.patch))
+        return artifacts
+
     project.library(name='zlib',
                     targets=['z'],
                     scripts=[script],
-                    target_decorators=[target_decorator])
+                    target_decorators=[target_decorator],
+                    artifacts_generators=[artifacts_generator])
 
     target = project.export(name='zlib',
                             includes=['include'],
