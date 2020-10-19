@@ -23,11 +23,21 @@ def configure(project):
         'boost_unit_test_framework', 'boost_wave', 'boost_wserialization'
     ]
 
+    def target_decorator(target_name, config, context):
+        if context.is_static() and context.is_windows():
+            target_name = 'lib' + target_name
+        return target_name
+
     def artifacts_generator(decorated_target, config, context):
         artifacts = []
         for suffix in context.artifact_suffix(config):
             artifact = context.artifact_prefix(
                 config) + decorated_target + suffix
+
+            if context.is_static() and context.is_windows(
+            ) and suffix != '.lib' and artifact.startswith('lib'):
+                artifact = artifact[3:]
+
             artifacts.append(artifact)
             if suffix == '.so':
                 artifacts.append('{}.{}'.format(artifact,
@@ -37,15 +47,20 @@ def configure(project):
     project.library(name='boost',
                     targets=targets,
                     scripts=[script],
+                    target_decorators=[target_decorator],
                     artifacts_generators=[artifacts_generator])
 
-    project.export(name='boost',
-                   includes=['include'],
-                   defines=[
-                       'BOOST_ASIO_DISABLE_THREAD_KEYWORD_EXTENSION',
-                       'BOOST_AUTO_LINK_NOMANGLE'
-                   ],
-                   licenses='LICENSE_1_0.txt')
+    task = project.export(name='boost',
+                          includes=['include'],
+                          defines=[
+                              'BOOST_ASIO_DISABLE_THREAD_KEYWORD_EXTENSION',
+                              'BOOST_AUTO_LINK_NOMANGLE'
+                          ],
+                          licenses='LICENSE_1_0.txt')
+
+    task.when(osystem=['windows'],
+              link=['static'],
+              defines=['BOOST_ALL_NO_LIB'])
 
     # NOTE: Not available on Windows
     # 'boost_signals'
