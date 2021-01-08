@@ -64,6 +64,13 @@ def build_mongoc(ctx):
 
     mongoc_dir = ctx.get_project_dir()
 
+    version_file = open(os.path.join(mongoc_dir, 'VERSION_CURRENT'), 'w')
+    ret = subprocess.call(['python', 'build/calc_release_version.py'],
+                          stdout=version_file,
+                          cwd=mongoc_dir)
+    if ret:
+        raise RuntimeError("Cannot calculate current version")
+
     target_dir = ctx.context.out_dir
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
