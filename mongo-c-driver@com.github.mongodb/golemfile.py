@@ -27,8 +27,21 @@ def configure(project):
                 artifacts.append('{}.{}.{}.{}'.format(artifact, 0, 0, 0))
         return artifacts
 
+    project.dependency(name='zlib',
+                       repository='https://github.com/madler/zlib.git',
+                       version='~1.2.11',
+                       variant="release",
+                       shallow=True)
+
+    project.dependency(name='openssl',
+                       repository='https://github.com/openssl/openssl.git',
+                       version='~1.1.1',
+                       variant="release",
+                       shallow=True)
+
     target = project.library(name='mongo-c-driver',
                              targets=['bson', 'mongoc'],
+                             deps=['zlib', 'openssl'],
                              scripts=[script],
                              artifacts_generators=[artifacts_generator])
 
@@ -102,9 +115,21 @@ def build_mongoc(ctx):
 
     prefix_path = '-DCMAKE_INSTALL_PREFIX=' + prefix_dir
 
+    zlib_libs = ctx.find_dependency_libraries_files(dep_name='zlib',
+                                                    target_name='z')
+    crypto_libs = ctx.find_dependency_libraries_files(dep_name='openssl',
+                                                      target_name='crypto')
+    ssl_libs = ctx.find_dependency_libraries_files(dep_name='openssl',
+                                                   target_name='ssl')
+
     ret = subprocess.call(['cmake', mongoc_dir] + opt_arch + [
         opt_variant, opt_target, '-DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF',
-        '-DENABLE_EXAMPLES=OFF', '-DENABLE_TESTS=OFF', prefix_path
+        '-DENABLE_EXAMPLES=OFF', '-DENABLE_TESTS=OFF',
+        '-DZLIB_LIBRARY=' + zlib_libs[0],
+        '-DZLIB_INCLUDE_DIR=' + ctx.find_dependency_includes('zlib')[0],
+        '-DOPENSSL_CRYPTO_LIBRARY=' + crypto_libs[0],
+        '-DOPENSSL_SSL_LIBRARY=' + ssl_libs[0], '-DOPENSSL_INCLUDE_DIR=' +
+        ctx.find_dependency_includes('openssl')[0], prefix_path
     ],
                           cwd=target_dir)
     if ret:
