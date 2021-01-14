@@ -62,7 +62,9 @@ def script(ctx):
 
     source_path = ctx.get_project_dir()
 
-    cmake_options = ['-Dnlohmann_json_DIR=' + json_include]
+    cmake_options = [
+        '-Dnlohmann_json_DIR=' + json_include, '-DJSON_HPP=' + json_include
+    ]
 
     if ctx.is_windows():
         cmake_options.append('-DCMAKE_CXX_FLAGS=/std:c++17')
