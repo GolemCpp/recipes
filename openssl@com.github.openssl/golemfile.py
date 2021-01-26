@@ -91,10 +91,17 @@ def script(ctx):
 
     opt_libs = []
     opt_libs.append('--prefix=' + os.path.join(openssl_dir, 'output'))
-    opt_libs.append('--openssldir=' +
-                    ('/etc/ssl' if ctx.is_linux() else 'ssl'))
 
-    openssl_config_args = ['no-asm', 'enable-static-engine', opt_variant]
+    if ctx.is_windows():
+        opt_libs.append('--openssldir="C:\\Program Files\\Common Files\\SSL"')
+        opt_libs.append('--libdir="C:\\Program Files\\Common Files\\SSL"')
+    else:
+        opt_libs.append('--openssldir=/etc/ssl')
+        opt_libs.append('--libdir=/usr/lib')
+
+    openssl_config_args = [
+        'no-asm', 'no-dynamic-engine', 'enable-static-engine', opt_variant
+    ]
 
     if ctx.is_static():
         openssl_config_args.append('no-shared')
