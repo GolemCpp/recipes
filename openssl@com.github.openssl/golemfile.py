@@ -162,7 +162,7 @@ def script(ctx):
         return 1
 
     out_path = ctx.make_out_path()
-    ctx.copy_binary_artifacts(openssl_dir, out_path)
+    ctx.copy_binary_artifacts_from_build(openssl_dir, out_path)
 
     distutils.dir_util.copy_tree(
         os.path.join(openssl_dir, 'include', 'openssl'),
