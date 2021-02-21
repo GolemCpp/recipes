@@ -92,11 +92,11 @@ def script(ctx):
         irrxml_path = os.path.join(irrxml_path, variant)
         zlib_path = os.path.join(zlib_path, variant)
 
-    ctx.copy_binary_artifacts(os.path.join(code_path), out_path)
-    ctx.copy_binary_artifacts(os.path.join(irrxml_path), out_path)
+    ctx.copy_binary_artifacts_from_build(os.path.join(code_path), out_path)
+    ctx.copy_binary_artifacts_from_build(os.path.join(irrxml_path), out_path)
 
     if ctx.is_windows():
-        ctx.copy_binary_artifacts(os.path.join(zlib_path), out_path)
+        ctx.copy_binary_artifacts_from_build(os.path.join(zlib_path), out_path)
 
     distutils.dir_util.copy_tree(os.path.join(assimp_dir, 'include'),
                                  os.path.join(assimp_dir, '..', 'include'))

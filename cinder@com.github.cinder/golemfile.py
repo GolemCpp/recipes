@@ -195,7 +195,7 @@ def script(ctx):
     out_path = ctx.make_out_path()
 
     if ctx.is_linux():
-        ctx.copy_binary_artifacts(
+        ctx.copy_binary_artifacts_from_build(
             os.path.join(cinder_dir, 'lib', 'linux', 'x86_64', 'ogl', variant),
             out_path)
 
@@ -206,7 +206,7 @@ def script(ctx):
         for path in full_paths:
             if os.path.basename(os.path.normpath(path)).startswith(
                     'v') and os.path.isdir(path):
-                ctx.copy_binary_artifacts(path, out_path)
+                ctx.copy_binary_artifacts_from_build(path, out_path)
 
         path = os.path.join(target_dir, variant)
-        ctx.copy_binary_artifacts(path, out_path)
+        ctx.copy_binary_artifacts_from_build(path, out_path)

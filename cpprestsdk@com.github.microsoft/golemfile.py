@@ -141,4 +141,4 @@ def script(ctx):
     if ctx.is_windows():
         binaries_directory = os.path.join(binaries_directory, 'Release')
 
-    ctx.copy_binary_artifacts(binaries_directory, out_path)
+    ctx.copy_binary_artifacts_from_build(binaries_directory, out_path)

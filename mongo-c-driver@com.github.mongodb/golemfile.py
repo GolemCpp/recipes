@@ -152,7 +152,8 @@ def script(ctx):
     prefix_dir = make_install_path(ctx)
 
     out_path = ctx.make_out_path()
-    ctx.copy_binary_artifacts(os.path.join(prefix_dir, 'lib'), out_path)
+    ctx.copy_binary_artifacts_from_build(os.path.join(prefix_dir, 'lib'),
+                                         out_path)
 
     include_dir = ctx.make_project_path('include')
     os.makedirs(include_dir)

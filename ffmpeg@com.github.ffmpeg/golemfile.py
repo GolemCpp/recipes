@@ -123,5 +123,5 @@ def script(ctx):
         return 1
 
     out_path = ctx.make_out_path()
-    ctx.copy_binary_artifacts(os.path.join(ffmpeg_dir, 'output', 'bin'),
-                              out_path)
+    ctx.copy_binary_artifacts_from_build(
+        os.path.join(ffmpeg_dir, 'output', 'bin'), out_path)

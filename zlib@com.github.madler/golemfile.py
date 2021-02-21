@@ -74,7 +74,7 @@ def build_msvc(ctx):
     ctx.run_msbuild_command(project_path=project_path)
 
     out_path = ctx.make_out_path()
-    ctx.copy_binary_artifacts(build_path, out_path)
+    ctx.copy_binary_artifacts_from_build(build_path, out_path)
 
 
 def build_gcc(ctx):
@@ -94,7 +94,7 @@ def build_gcc(ctx):
         raise RuntimeError("ERROR: make")
 
     out_path = ctx.make_out_path()
-    ctx.copy_binary_artifacts(repo_dir, out_path)
+    ctx.copy_binary_artifacts_from_build(repo_dir, out_path)
 
 
 def script(ctx):

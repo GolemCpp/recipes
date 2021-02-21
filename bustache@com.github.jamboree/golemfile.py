@@ -75,4 +75,4 @@ def script(ctx):
         raise RuntimeError("ERROR: cmake --build")
 
     out_path = ctx.make_out_path()
-    ctx.copy_binary_artifacts(target_dir, out_path)
+    ctx.copy_binary_artifacts_from_build(target_dir, out_path)

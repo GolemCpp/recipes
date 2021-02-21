@@ -97,9 +97,11 @@ def script(ctx):
 
     out_path = ctx.make_out_path()
     if ctx.is_windows():
-        ctx.copy_binary_artifacts(os.path.join(target_dir, variant), out_path)
+        ctx.copy_binary_artifacts_from_build(os.path.join(target_dir, variant),
+                                             out_path)
     else:
-        ctx.copy_binary_artifacts(os.path.join(target_dir), out_path)
+        ctx.copy_binary_artifacts_from_build(os.path.join(target_dir),
+                                             out_path)
 
     include_dir = os.path.join(src_dir, 'include')
     if not os.path.exists(include_dir):
