@@ -26,10 +26,6 @@ def configure(project):
                        variant="release",
                        shallow=True)
 
-    def target_decorator(target_name, config, context):
-        return target_name if not context.is_windows() else '{}_{}_{}'.format(
-            target_name, context.version.major, context.version.minor)
-
     def artifacts_generator(decorated_target, config, context):
         artifacts = []
         for suffix in context.artifact_suffix(config):
@@ -51,7 +47,6 @@ def configure(project):
     project.library(name='cpprest',
                     deps=['boost', 'openssl', 'zlib'],
                     scripts=[script],
-                    target_decorators=[target_decorator],
                     artifacts_generators=[artifacts_generator])
 
     project.export(name='cpprest',
@@ -106,11 +101,16 @@ def script(ctx):
                                                       target_name='crypto')
     ssl_libs = ctx.find_dependency_libraries_files(dep_name='openssl',
                                                    target_name='ssl')
+
+    ssl_libraries = ssl_libs[0] + ";" + crypto_libs[0]
+
     opt_deps += [
         '-DBOOST_LIBRARYDIR=' + ctx.find_dependency_libraries('boost')[0],
         '-DBOOST_INCLUDEDIR=' + ctx.find_dependency_includes('boost')[0],
         '-DBoost_NO_SYSTEM_PATHS=ON', '-DZLIB_LIBRARY=' + zlib_libs[0],
         '-DZLIB_INCLUDE_DIR=' + ctx.find_dependency_includes('zlib')[0],
+        '-DOPENSSL_LIBRARIES=' + ssl_libraries,
+        '-DOPENSSL_ROOT_DIR=' + ctx.find_dependency_libraries('openssl')[0],
         '-DOPENSSL_CRYPTO_LIBRARY=' + crypto_libs[0],
         '-DOPENSSL_SSL_LIBRARY=' + ssl_libs[0],
         '-DOPENSSL_INCLUDE_DIR=' + ctx.find_dependency_includes('openssl')[0],
