@@ -121,13 +121,14 @@ def build_mongoc(ctx):
                                                       target_name='crypto')
     ssl_libs = ctx.find_dependency_libraries_files(dep_name='openssl',
                                                    target_name='ssl')
+    ssl_libraries = ssl_libs[0] + ";" + crypto_libs[0]
 
     ret = subprocess.call(['cmake', mongoc_dir] + opt_arch + [
         opt_variant, opt_target, '-DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF',
         '-DENABLE_EXAMPLES=OFF', '-DENABLE_TESTS=OFF',
-        '-DZLIB_LIBRARY=' + zlib_libs[0],
-        '-DZLIB_INCLUDE_DIR=' + ctx.find_dependency_includes('zlib')[0],
-        '-DOPENSSL_CRYPTO_LIBRARY=' + crypto_libs[0],
+        '-DZLIB_LIBRARY=' + zlib_libs[0], '-DZLIB_INCLUDE_DIR=' +
+        ctx.find_dependency_includes('zlib')[0], '-DOPENSSL_LIBRARIES=' +
+        ssl_libraries, '-DOPENSSL_CRYPTO_LIBRARY=' + crypto_libs[0],
         '-DOPENSSL_SSL_LIBRARY=' + ssl_libs[0], '-DOPENSSL_INCLUDE_DIR=' +
         ctx.find_dependency_includes('openssl')[0], prefix_path
     ],

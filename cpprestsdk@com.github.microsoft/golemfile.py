@@ -101,7 +101,6 @@ def script(ctx):
                                                       target_name='crypto')
     ssl_libs = ctx.find_dependency_libraries_files(dep_name='openssl',
                                                    target_name='ssl')
-
     ssl_libraries = ssl_libs[0] + ";" + crypto_libs[0]
 
     opt_deps += [

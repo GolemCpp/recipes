@@ -70,10 +70,12 @@ def script(ctx):
                                                       target_name='crypto')
     ssl_libs = ctx.find_dependency_libraries_files(dep_name='openssl',
                                                    target_name='ssl')
+    ssl_libraries = ssl_libs[0] + ";" + crypto_libs[0]
+
     opt_deps += [
         '-DBOOST_LIBRARYDIR=' + ctx.find_dependency_libraries('boost')[0],
         '-DBOOST_INCLUDEDIR=' + ctx.find_dependency_includes('boost')[0],
-        '-DBoost_NO_SYSTEM_PATHS=ON',
+        '-DBoost_NO_SYSTEM_PATHS=ON', '-DOPENSSL_LIBRARIES=' + ssl_libraries,
         '-DOPENSSL_CRYPTO_LIBRARY=' + crypto_libs[0],
         '-DOPENSSL_SSL_LIBRARY=' + ssl_libs[0],
         '-DOPENSSL_INCLUDE_DIR=' + ctx.find_dependency_includes('openssl')[0]
