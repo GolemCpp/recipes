@@ -126,5 +126,5 @@ def script(ctx):
         shutil.rmtree(include_dir)
     os.makedirs(include_dir)
 
-    distutils.dir_util.copy_tree(os.path.join(repo_dir, 'src', 'loc'),
-                                 os.path.join(include_dir, 'loc'))
+    distutils.dir_util.copy_tree(os.path.join(repo_dir, 'src', 'libloc'),
+                                 os.path.join(include_dir, 'libloc'))
