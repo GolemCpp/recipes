@@ -54,24 +54,25 @@ def script(ctx):
 
     ctx.build_dependency('json')
 
-    json_includes = ctx.find_dependency_includes('json')
-    if not json_includes:
-        raise Exception("Error: Can't find json include directory")
-
-    json_include = json_includes[0]
+    json = ctx.find_dependency('json')
+    if not json:
+        raise Exception("Error: Can't find json dependency")
 
     source_path = ctx.get_project_dir()
 
-    cmake_options = [
-        '-Dnlohmann_json_DIR=' + json_include, '-DJSON_HPP=' + json_include
-    ]
+    cmake_env = {
+        'NLOHMANN_JSON_VERSION': json.resolved_version
+    }
+    
+    cmake_options = []
 
     if ctx.is_windows():
         cmake_options.append('-DCMAKE_CXX_FLAGS=/std:c++17')
 
     ctx.cmake_build(source_path=source_path,
                     targets=['nlohmann_json_schema_validator'],
-                    options=cmake_options)
+                    options=cmake_options,
+                    env=cmake_env)
 
     ctx.export_binaries(recursively=True)
 
