@@ -2,7 +2,6 @@
 
 import os
 import shutil
-import distutils
 import subprocess
 
 
@@ -126,5 +125,6 @@ def script(ctx):
         shutil.rmtree(include_dir)
     os.makedirs(include_dir)
 
-    distutils.dir_util.copy_tree(os.path.join(repo_dir, 'src', 'libloc'),
-                                 os.path.join(include_dir, 'libloc'))
+    shutil.copytree(os.path.join(repo_dir, 'src', 'libloc'),
+                    os.path.join(include_dir, 'libloc'),
+                    dirs_exist_ok=True)

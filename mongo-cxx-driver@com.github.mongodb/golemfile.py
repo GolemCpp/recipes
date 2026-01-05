@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import distutils
 import subprocess
 import shutil
 import glob
@@ -141,13 +140,12 @@ def script(ctx):
     include_dir = ctx.make_project_path('include')
     os.makedirs(include_dir)
 
-    distutils.dir_util.copy_tree(os.path.join(prefix_dir, 'include', 'bsoncxx',
-                                              'v_noabi', 'bsoncxx'),
-                                 os.path.join(include_dir, 'bsoncxx'),
-                                 preserve_symlinks=1)
+    shutil.copytree(os.path.join(prefix_dir, 'include', 'bsoncxx', 'v_noabi', 'bsoncxx'),
+                    os.path.join(include_dir, 'bsoncxx'),
+                    dirs_exist_ok=True,
+                    symlinks=True)
 
-    distutils.dir_util.copy_tree(os.path.join(prefix_dir, 'include',
-                                              'mongocxx', 'v_noabi',
-                                              'mongocxx'),
-                                 os.path.join(include_dir, 'mongocxx'),
-                                 preserve_symlinks=1)
+    shutil.copytree(os.path.join(prefix_dir, 'include', 'mongocxx', 'v_noabi', 'mongocxx'),
+                    os.path.join(include_dir, 'mongocxx'),
+                    dirs_exist_ok=True,
+                    symlinks=True)

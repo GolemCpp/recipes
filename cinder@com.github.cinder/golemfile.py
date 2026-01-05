@@ -5,7 +5,6 @@ import os
 from os import fdopen, remove
 from shutil import move
 from glob import glob
-import distutils
 import subprocess
 import shutil
 import sys

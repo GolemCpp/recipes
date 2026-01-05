@@ -30,7 +30,6 @@ import os
 import sys
 import shutil
 import subprocess
-import distutils
 
 
 def script(ctx):

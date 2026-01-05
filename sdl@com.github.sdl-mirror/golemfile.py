@@ -15,7 +15,6 @@ import sys
 import glob
 import shutil
 import subprocess
-import distutils
 import urllib2
 import zipfile
 

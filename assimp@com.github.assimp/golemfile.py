@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import glob
-import distutils
 import subprocess
 import shutil
 import sys
@@ -98,7 +97,9 @@ def script(ctx):
     if ctx.is_windows():
         ctx.copy_binary_artifacts_from_build(os.path.join(zlib_path), out_path)
 
-    distutils.dir_util.copy_tree(os.path.join(assimp_dir, 'include'),
-                                 os.path.join(assimp_dir, '..', 'include'))
-    distutils.dir_util.copy_tree(os.path.join(target_dir, 'include'),
-                                 os.path.join(assimp_dir, '..', 'include'))
+    shutil.copytree(os.path.join(assimp_dir, 'include'),
+            os.path.join(assimp_dir, '..', 'include'),
+            dirs_exist_ok=True)
+    shutil.copytree(os.path.join(target_dir, 'include'),
+            os.path.join(assimp_dir, '..', 'include'),
+            dirs_exist_ok=True)

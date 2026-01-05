@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import distutils
 import subprocess
 import shutil
 import glob
@@ -164,6 +163,7 @@ def script(ctx):
     out_path = ctx.make_out_path()
     ctx.copy_binary_artifacts_from_build(openssl_dir, out_path)
 
-    distutils.dir_util.copy_tree(
+    shutil.copytree(
         os.path.join(openssl_dir, 'include', 'openssl'),
-        os.path.join(openssl_dir, 'output', 'include', 'openssl'))
+        os.path.join(openssl_dir, 'output', 'include', 'openssl'),
+        dirs_exist_ok=True)

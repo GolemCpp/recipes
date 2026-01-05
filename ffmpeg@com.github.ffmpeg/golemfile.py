@@ -22,7 +22,6 @@ import sys
 import glob
 import shutil
 import subprocess
-import distutils
 
 
 def msvc_vcvars_cmd(ctx):
