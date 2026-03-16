@@ -22,6 +22,7 @@ import sys
 import glob
 import shutil
 import subprocess
+from golemcpp.golem import helpers
 
 
 def msvc_vcvars_cmd(ctx):
@@ -54,9 +55,8 @@ def msvc_vcvars_cmd(ctx):
 
 def script(ctx):
 
-    ret = subprocess.call(['git', 'reset', '--hard'],
-                          cwd=ctx.get_project_dir())
-    ret = subprocess.call(['git', 'clean', '-fxd'], cwd=ctx.get_project_dir())
+    ret = helpers.call_git(['reset', '--hard'], cwd=ctx.get_project_dir())
+    ret = helpers.call_git(['clean', '-fxd'], cwd=ctx.get_project_dir())
 
     ffmpeg_dir = ctx.make_project_path('FFmpeg')
 
