@@ -127,7 +127,7 @@ def script(ctx):
     else:
         opt_arch += '32'
 
-    opt_runtime = 'runtime-link=' + ctx.runtime()
+    opt_runtime = 'runtime-link=' + ctx.runtime_link()
     opt_link = 'link=' + ctx.link()
 
     opt_libs = []

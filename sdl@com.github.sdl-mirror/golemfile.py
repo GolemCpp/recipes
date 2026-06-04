@@ -74,7 +74,7 @@ def script(ctx):
     opt_link = [opt_link_shared, opt_link_static]
 
     opt_runtime_link = '-DFORCE_STATIC_VCRT:BOOL='
-    if ctx.runtime() == ctx.link_shared():
+    if ctx.runtime_link() == ctx.link_shared():
         opt_runtime_link += 'OFF'
     else:
         opt_runtime_link += 'ON'
