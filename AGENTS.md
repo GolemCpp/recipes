@@ -2,7 +2,7 @@
 
 ## Scope
 
-- This folder is the default recipe catalog used by Golem for dependencies that do not ship their own Golem project file.
+- This folder is the default cookbook used by Golem: the catalog of recipes for dependencies that do not ship their own Golem project file.
 - It is not a standalone application. Most validation happens indirectly through a consuming project.
 
 ## Source Of Truth
