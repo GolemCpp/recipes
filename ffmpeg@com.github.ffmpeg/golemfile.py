@@ -55,8 +55,8 @@ def msvc_vcvars_cmd(ctx):
 
 def script(ctx):
 
-    ret = helpers.call_git(['reset', '--hard'], cwd=ctx.get_project_dir())
-    ret = helpers.call_git(['clean', '-fxd'], cwd=ctx.get_project_dir())
+    helpers.try_git(['reset', '--hard'], cwd=ctx.get_project_dir())
+    helpers.try_git(['clean', '-fxd'], cwd=ctx.get_project_dir())
 
     ffmpeg_dir = ctx.make_project_path('FFmpeg')
 
