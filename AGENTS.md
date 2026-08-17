@@ -16,6 +16,7 @@
 - Do not invent repo-wide build or test commands here. Recipes are normally exercised through `golem resolve`, `golem dependencies`, and `golem build` from a consumer project such as [../golem/examples](../golem/examples).
 - Preserve the existing folder naming convention such as `json@com.github.nlohmann`; names are derived from repository identity.
 - Keep changes minimal and recipe-local unless the task is explicitly about shared helper behavior.
+- **Write comments and docstrings plainly.** Start a function docstring with a verb, in the imperative: `Build the library and export its headers.`. Keep one idea per sentence, mark the step with `therefore`, `so` or `but`, and use the words Golem and the upstream build system already use. Explain why a recipe does something unusual, which is what the next reader cannot work out from the code. The full rules are in the `Writing Code` section of [../golem/AGENTS.md](../golem/AGENTS.md).
 
 ## Useful Patterns
 
