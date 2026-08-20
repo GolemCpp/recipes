@@ -172,17 +172,17 @@ def script(ctx):
 
     cmd = ['cmake', cinder_dir] + [opt_variant, opt_target
                                    ] + opt_linux + opt_windows
-    print cmd
+    print(cmd)
     ret = subprocess.call(cmd, cwd=target_dir)
     if ret:
-        print "ERROR: cmake"
+        print("ERROR: cmake")
         return
 
     cmd = ['cmake', '--build', '.', '--config', variant]
-    print cmd
+    print(cmd)
     ret = subprocess.call(cmd, cwd=target_dir)
     if ret:
-        print "ERROR: cmake --build"
+        print("ERROR: cmake --build")
         return
 
     out_path = ctx.make_out_path()

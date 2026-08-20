@@ -30,7 +30,7 @@ def msvc_vcvars_cmd(ctx):
         'cmd', '/c', 'vswhere', '-latest', '-products', '*', '-property',
         'installationPath'
     ]
-    print ' '.join(cmd)
+    print(' '.join(cmd))
     ret = subprocess.Popen(
         cmd,
         cwd='C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer',
@@ -38,18 +38,18 @@ def msvc_vcvars_cmd(ctx):
         stderr=subprocess.PIPE)
     out, err = ret.communicate()
     if ret.returncode:
-        print "ERROR: " + ' '.join(cmd)
+        print("ERROR: " + ' '.join(cmd))
         return -1
     lines = out.splitlines()
     if not lines[0]:
         return 1
     msvc_path = lines[0]
-    print msvc_path
+    print(msvc_path)
 
     vcvars = msvc_path + '\\VC\\Auxiliary\\Build\\vcvarsall.bat'
     call_msvc = 'call "' + vcvars + '" ' + \
         ctx.context.env['MSVC_TARGETS'][0] + ' && '
-    print call_msvc
+    print(call_msvc)
     return call_msvc
 
 
@@ -92,9 +92,9 @@ def script(ctx):
 
     cmd = ' '.join(['./configure'] + opt_arch + opt_link + opt_variant +
                    opt_platform + opt_libs)
-    print cmd
+    print(cmd)
     my_env = os.environ
-    my_env['PATH'] = 'C:\WINDOWS\System32;C:\\msys64\\usr\\bin'
+    my_env['PATH'] = r'C:\WINDOWS\System32;C:\msys64\usr\bin'
 
     if subprocess.call("pacman -S diffutils make --noconfirm",
                        cwd=ffmpeg_dir,

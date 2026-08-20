@@ -13,9 +13,10 @@ def configure(project):
 import os
 import sys
 import glob
+import io
 import shutil
 import subprocess
-import urllib2
+import urllib.request
 import zipfile
 
 
@@ -26,13 +27,12 @@ def download_latest_src(ctx):
 
     downloadURL = "https://www.libsdl.org/release/" + name + ".zip"
 
-    print "Downloading ", downloadURL
-    response = urllib2.urlopen(downloadURL)
+    print('Downloading', downloadURL)
+    response = urllib.request.urlopen(downloadURL)
     zippedData = response.read()
 
     # save data to memory
-    from StringIO import StringIO
-    zipdata = StringIO()
+    zipdata = io.BytesIO()
     zipdata.write(zippedData)
 
     # extract the data
@@ -81,20 +81,20 @@ def script(ctx):
 
     opt_arch = ['-A', ctx.vs_platform()] if ctx.is_windows() else []
 
-    print ' '.join(['cmake', sdl2_dir] + opt_arch +
-                   [opt_variant, opt_runtime_link] + opt_link)
+    print(' '.join(['cmake', sdl2_dir] + opt_arch +
+                   [opt_variant, opt_runtime_link] + opt_link))
     ret = subprocess.call(['cmake', sdl2_dir] + opt_arch +
                           [opt_variant, opt_runtime_link] + opt_link +
                           ['-DEXTRA_LIBS=vcruntime'],
                           cwd=target_dir)
     if ret:
-        print "ERROR: cmake"
+        print("ERROR: cmake")
         return 1
 
     ret = subprocess.call(['cmake', '--build', '.', '--config', variant_name],
                           cwd=target_dir)
     if ret:
-        print "ERROR: cmake --build"
+        print("ERROR: cmake --build")
         return 1
 
     out_path = ctx.make_out_path()
