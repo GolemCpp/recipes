@@ -73,14 +73,7 @@ def script(ctx):
 
     opt_target = [opt_target_shared, opt_target_static]
 
-    if ctx.is_windows():
-        opt_arch = ['-A']
-        if ctx.is_x64():
-            opt_arch.append('x64')
-        else:
-            opt_arch.append('x86')
-    else:
-        opt_arch = []
+    opt_arch = ['-A', ctx.vs_platform()] if ctx.is_windows() else []
 
     ret = subprocess.call(['cmake', src_dir] + opt_arch +
                           [opt_variant, '-DBUILD_TESTS:BOOL=OFF'] + opt_target,

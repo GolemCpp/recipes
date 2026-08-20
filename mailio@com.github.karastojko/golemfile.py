@@ -54,14 +54,7 @@ def script(ctx):
     else:
         opt_target += 'ON'
 
-    if ctx.is_windows():
-        opt_arch = ['-A']
-        if ctx.is_x64():
-            opt_arch.append('x64')
-        else:
-            opt_arch.append('x86')
-    else:
-        opt_arch = []
+    opt_arch = ['-A', ctx.vs_platform()] if ctx.is_windows() else []
 
     opt_deps = []
 

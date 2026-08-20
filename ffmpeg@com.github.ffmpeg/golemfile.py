@@ -83,11 +83,10 @@ def script(ctx):
     if ctx.is_windows():
         opt_platform.append('--toolchain=msvc')
 
-    opt_arch = []
-    if ctx.is_x64():
-        opt_arch.append('--arch=amd64')
-    else:
-        opt_arch.append('--arch=i386')
+    # ffmpeg's own names for --arch, so the recipe spells them rather than
+    # asking Golem for a vocabulary that is not Golem's.
+    opt_arch = ['--arch=' + ('amd64' if ctx.get_arch() == 'x86_64'
+                             else 'i386')]
 
     call_msvc = msvc_vcvars_cmd(ctx)
 

@@ -52,15 +52,9 @@ def script(ctx):
     else:
         opt_target += '1'
 
-    opt_arch = ['-A']
-    if ctx.is_x64():
-        opt_arch.append('x64')
-    else:
-        opt_arch.append('x86')
-
     opt_windows = []
     if ctx.is_windows():
-        opt_windows += opt_arch
+        opt_windows += ['-A', ctx.vs_platform()]
 
     opt_linux = []
     opt_linux.append('-DASSIMP_BUILD_TESTS:BOOL=OFF')

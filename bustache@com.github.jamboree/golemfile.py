@@ -47,13 +47,7 @@ def script(ctx):
     else:
         opt_target += '1'
 
-    opt_arch = []
-    if ctx.is_windows():
-        opt_arch = ['-A']
-        if ctx.is_x64():
-            opt_arch.append('x64')
-        else:
-            opt_arch.append('x86')
+    opt_arch = ['-A', ctx.vs_platform()] if ctx.is_windows() else []
 
     boost_options = [
         '-DBOOST_LIBRARYDIR=' + ctx.find_dependency_libraries('boost')[0],

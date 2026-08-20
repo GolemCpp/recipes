@@ -121,11 +121,11 @@ def script(ctx):
     else:
         opt_variant += 'release'
 
-    opt_arch = 'address-model='
-    if ctx.is_x64():
-        opt_arch += '64'
-    else:
-        opt_arch += '32'
+    # b2 asks for a pointer width rather than an architecture, and that
+    # spelling is Boost's. Off x86 it would also need `architecture=`, which
+    # this recipe does not supply, so it builds for x86 only.
+    opt_arch = 'address-model=' + ('64' if ctx.get_arch() == 'x86_64'
+                                   else '32')
 
     opt_runtime = 'runtime-link=' + ctx.runtime()
     opt_link = 'link=' + ctx.link()

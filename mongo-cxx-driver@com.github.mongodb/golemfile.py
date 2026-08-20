@@ -92,14 +92,7 @@ def build_mongocxx(ctx):
     else:
         opt_target += 'ON'
 
-    opt_arch = ['-A']
-    if ctx.is_x64():
-        opt_arch.append('x64')
-    else:
-        opt_arch.append('x86')
-
-    if not ctx.is_windows():
-        opt_arch = []
+    opt_arch = ['-A', ctx.vs_platform()] if ctx.is_windows() else []
 
     prefix_dir = make_install_path(ctx)
     mongoc_out_path = make_cmake_prefix(ctx)

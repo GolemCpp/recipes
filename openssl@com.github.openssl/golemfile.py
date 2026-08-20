@@ -7,6 +7,16 @@ import sys
 import os
 
 
+def is_x86_64(context):
+    """
+    Whether this build is for x86_64.
+
+    The only split OpenSSL's own configuration names make here, and it is
+    OpenSSL's split rather than Golem's, so the recipe asks it directly.
+    """
+    return context.get_arch() == 'x86_64'
+
+
 def configure(project):
     def target_decorator(target_name, config, context):
         return 'lib' + target_name if context.is_windows() else target_name
@@ -16,10 +26,9 @@ def configure(project):
         for suffix in context.artifact_suffix(config):
             artifact = context.artifact_prefix(config) + decorated_target
             if suffix in ['.dll', '.pdb']:
-                artifact = '{}-{}_{}-{}'.format(artifact,
-                                                context.version.major,
-                                                context.version.minor,
-                                                context.get_arch())
+                artifact = '{}-{}_{}-{}'.format(
+                    artifact, context.version.major, context.version.minor,
+                    'x64' if is_x86_64(context) else 'x86')
             artifact += suffix
             artifacts.append(artifact)
             if suffix == '.so':
@@ -66,24 +75,24 @@ def script(ctx):
     if ctx.is_debug():
         opt_variant = '--debug'
         if ctx.is_windows():
-            if ctx.is_x64():
+            if is_x86_64(ctx):
                 openssl_config.append('debug-VC-WIN64A')
             else:
                 openssl_config.append('debug-VC-WIN32')
         elif ctx.is_darwin():
-            if ctx.is_x64():
+            if is_x86_64(ctx):
                 openssl_config.append('debug-darwin64-x86_64-cc')
             else:
                 openssl_config.append('debug-darwin-i386-cc')
     else:
         opt_variant = '--release'
         if ctx.is_windows():
-            if ctx.is_x64():
+            if is_x86_64(ctx):
                 openssl_config.append('VC-WIN64A')
             else:
                 openssl_config.append('VC-WIN32')
         elif ctx.is_darwin():
-            if ctx.is_x64():
+            if is_x86_64(ctx):
                 openssl_config.append('darwin64-x86_64-cc')
             else:
                 openssl_config.append('darwin-i386-cc')

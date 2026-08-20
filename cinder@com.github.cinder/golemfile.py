@@ -158,15 +158,9 @@ def script(ctx):
     else:
         opt_target += '1'
 
-    opt_arch = ['-A']
-    if ctx.is_x64():
-        opt_arch.append('x64')
-    else:
-        opt_arch.append('x86')
-
     opt_windows = []
     if ctx.is_windows():
-        opt_windows += opt_arch
+        opt_windows += ['-A', ctx.vs_platform()]
         patch_src_for_windows(cinder_dir)
         patch_cmake_for_windows(cinder_dir)
 
@@ -199,8 +193,12 @@ def script(ctx):
             out_path)
 
     elif ctx.is_windows():
+        # Cinder's own layout, not Visual Studio's: it spells 32-bit `x86`
+        # where Visual Studio says `Win32`, so vs_platform() would not find
+        # the directory.
         path = os.path.join(cinder_dir, 'lib', 'msw',
-                            'x64' if ctx.is_x64() else 'x86', variant)
+                            'x64' if ctx.get_arch() == 'x86_64' else 'x86',
+                            variant)
         full_paths = glob(path + '/*')
         for path in full_paths:
             if os.path.basename(os.path.normpath(path)).startswith(

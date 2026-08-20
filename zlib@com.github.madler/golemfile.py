@@ -63,12 +63,12 @@ def build_msvc(ctx):
     if ctx.is_static():
         project_path = os.path.join(project_path, 'zlibstat.vcxproj')
         build_path = os.path.join(
-            build_path, ctx.get_arch(),
+            build_path, ctx.vs_platform(),
             'ZlibStat' + ('Release' if ctx.is_release() else 'Debug'))
     else:
         project_path = os.path.join(project_path, 'zlibvc.vcxproj')
         build_path = os.path.join(
-            build_path, ctx.get_arch(),
+            build_path, ctx.vs_platform(),
             'ZlibDll' + ('Release' if ctx.is_release() else 'Debug'))
 
     ctx.run_msbuild_command(project_path=project_path)

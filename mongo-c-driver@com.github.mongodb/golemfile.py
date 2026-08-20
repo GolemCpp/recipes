@@ -58,7 +58,7 @@ def configure(project):
                 lib=["rt", "sasl2", "icuuc", "z", "resolv"])
 
     target.when(link=['static'],
-                osystem=['osx'],
+                osystem=['macos'],
                 lib=["sasl2", "z", "resolv"],
                 framework=['CoreFoundation', 'Security'])
 
@@ -101,14 +101,7 @@ def build_mongoc(ctx):
     else:
         opt_target += 'OFF'
 
-    opt_arch = ['-A']
-    if ctx.is_x64():
-        opt_arch.append('x64')
-    else:
-        opt_arch.append('x86')
-
-    if not ctx.is_windows():
-        opt_arch = []
+    opt_arch = ['-A', ctx.vs_platform()] if ctx.is_windows() else []
 
     prefix_dir = make_install_path(ctx)
 
