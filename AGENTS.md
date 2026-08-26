@@ -26,6 +26,6 @@
 
 ## Useful Patterns
 
-- [@json@nlohmann@github.com/golemfile.py](@json@nlohmann@github.com/golemfile.py): minimal header-only export recipe.
-- [@bustache@jamboree@github.com/golemfile.py](@bustache@jamboree@github.com/golemfile.py): custom script-driven build.
-- [@boost@boostorg@github.com/golemfile.py](@boost@boostorg@github.com/golemfile.py): complex recipe with platform branching and generated artifacts.
+- [@json@nlohmann/golemfile.py](@json@nlohmann/golemfile.py): minimal header-only export recipe.
+- [@bustache/golemfile.py](@bustache/golemfile.py): custom script-driven build.
+- [@boost/golemfile.py](@boost/golemfile.py): complex recipe with platform branching and generated artifacts.

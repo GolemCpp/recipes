@@ -1,8 +1,9 @@
 '''
 Whether every recipe here is named what Golem will look it up by.
 
-A recipe answers to its directory name and to nothing else. Golem composes it,
-so no identity below is typed by hand.
+Golem drops the last field of an identity until something answers, so a recipe
+answers to its directory name and to every identity above it. Golem composes
+them, so no identity below is typed by hand.
 '''
 
 import ast
@@ -10,7 +11,6 @@ import os
 
 import pytest
 
-from golemcpp.golem import locator
 from golemcpp.golem.source_id import SourceId
 
 
@@ -102,18 +102,25 @@ def test_no_two_recipes_name_one_identity():
 @pytest.mark.parametrize('recipe, repository', declared_dependencies())
 def test_a_declared_dependency_finds_its_recipe(recipe, repository):
     '''
-    Check a dependency a recipe declares is named here the way Golem asks for it.
+    Check a dependency a recipe declares resolves to a recipe here.
 
-    This is the agreement itself rather than the shape of a name: the recipe
-    reached is the one a consumer reaches, by the same locator.
+    This is the agreement itself rather than the shape of a name: what is
+    reached is what a consumer reaches, by the same locator. Golem drops the
+    last field of an identity until something answers, so the rung that answers
+    may be shorter than the identity the locator composes.
     '''
-    identity = locator.generate_id(repository)
+    identity = SourceId.from_locator(repository)
 
-    if identity in DEPENDENCIES_WITHOUT_A_RECIPE:
+    if str(identity) in DEPENDENCIES_WITHOUT_A_RECIPE:
         pytest.skip('{} ships its own project file'.format(identity))
 
-    assert identity in recipes(), (
-        "{} declares {}, which Golem looks up as '{}', and no directory here "
-        "answers to that. Rename the recipe, or list the identity in "
-        "DEPENDENCIES_WITHOUT_A_RECIPE with the reason.".format(
-            recipe, repository, identity))
+    held = set(recipes())
+    answering = [str(rung) for rung in identity.rungs() if str(rung) in held]
+
+    assert answering, (
+        "{} declares {}, which Golem looks up as '{}', and nothing here "
+        "answers it at any qualification ({}). Name a recipe at one of those, "
+        "or list the identity in DEPENDENCIES_WITHOUT_A_RECIPE with the "
+        "reason.".format(
+            recipe, repository, identity,
+            ', '.join(str(rung) for rung in identity.rungs())))
