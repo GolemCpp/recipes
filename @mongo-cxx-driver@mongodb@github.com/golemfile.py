@@ -133,12 +133,14 @@ def script(ctx):
     include_dir = ctx.make_project_path('include')
     os.makedirs(include_dir)
 
-    shutil.copytree(os.path.join(prefix_dir, 'include', 'bsoncxx', 'v_noabi', 'bsoncxx'),
+    shutil.copytree(os.path.join(prefix_dir, 'include', 'bsoncxx',
+                                 'v_noabi', 'bsoncxx'),
                     os.path.join(include_dir, 'bsoncxx'),
                     dirs_exist_ok=True,
                     symlinks=True)
 
-    shutil.copytree(os.path.join(prefix_dir, 'include', 'mongocxx', 'v_noabi', 'mongocxx'),
+    shutil.copytree(os.path.join(prefix_dir, 'include', 'mongocxx',
+                                 'v_noabi', 'mongocxx'),
                     os.path.join(include_dir, 'mongocxx'),
                     dirs_exist_ok=True,
                     symlinks=True)

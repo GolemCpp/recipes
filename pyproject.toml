@@ -11,3 +11,9 @@ line-length = 88
 [tool.ruff.lint]
 # Width only, as in golem.
 select = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# The long lines here are CMake statements written verbatim into a patch file.
+# Splitting a string hides what is being written, and what is being written is
+# the whole point of the recipe, therefore the width loses to the reader.
+"@cinder@cinder@github.com/golemfile.py" = ["E501"]
