@@ -3,7 +3,7 @@
 ## Scope
 
 - This folder is the default cookbook used by Golem: the catalog of recipes for dependencies that do not ship their own Golem project file.
-- It is not a standalone application. Most validation happens indirectly through a consuming project.
+- It is not a standalone application. What can be checked here is the catalogue itself (that a recipe is named what Golem looks it up by) which [tests/test_the_catalogue.py](tests/test_the_catalogue.py) does. Whether a recipe _builds_ is still validated indirectly, through a consuming project.
 
 ## Source Of Truth
 
@@ -14,7 +14,7 @@
 ## Working Rules
 
 - Do not assume one uniform recipe shape. Recipes may be header-only, compile sources directly, or wrap upstream build systems.
-- Do not invent repo-wide build or test commands here. Recipes are normally exercised through `golem resolve`, `golem dependencies`, and `golem build` from a consumer project such as [../golem/examples](../golem/examples).
+- There is one repo-wide command, and it is `python -m pytest tests`. It needs Golem importable, and the Golem it is checked against is the **released** one (`pip install golemcpp`) because this branch is what a released Golem reads. A sibling checkout on `PYTHONPATH` stands in while working across both repositories. The identities the test compares are the ones Golem composes, never ones written out here, which is what makes the check an agreement rather than a spelling. Do not invent any other repo-wide command: whether a recipe builds is exercised through `golem resolve`, `golem dependencies` and `golem build` from a consumer project such as [../golem/examples](../golem/examples).
 - A recipe directory is named after the source identity Golem composes from the dependency's repository URL, `@<name>@<owner>@<host>` for a forge: `https://github.com/nlohmann/json.git` is `@json@nlohmann@github.com`. Never spell one by hand from a URL that is not that shape, because a field Golem could not spell safely carries a digest; ask Golem instead, which names the identity it looked for whenever no recipe answers.
 - The leading `@` is what tells a recipe from everything else this repository holds, therefore a directory without one is furniture and is never loaded as a recipe.
 - Keep changes minimal and recipe-local unless the task is explicitly about shared helper behavior.

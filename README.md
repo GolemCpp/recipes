@@ -29,6 +29,15 @@ Read [Recipes](https://golemcpp.org/docs/advanced/recipes/) for what a recipe is
 
 The quickest way to find the name a recipe needs is to let Golem ask for it. When no recipe matches, it names the identity it looked for, and a directory of that name is what answers.
 
+Before opening a pull request, check your directory corresponds to the identity being looked for:
+
+```bash
+pip install golemcpp
+python -m pytest tests
+```
+
+The tests use Golem itself to compose the identity and check the recipes have valid directory names.
+
 Three worth reading before writing one:
 
 - [@json@nlohmann@github.com/golemfile.py](@json@nlohmann@github.com/golemfile.py) — minimal header-only export.
