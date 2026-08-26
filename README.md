@@ -23,6 +23,14 @@ One directory per dependency, named after the [source identity](https://golemcpp
 
 The leading `@` in a recipe directory name is what tells a recipe from everything else this repository holds.
 
+A recipe is named at the qualification that makes it unambiguous, and no further:
+
+- `@boost`: the name alone, where nothing else goes by it.
+- `@json@nlohmann`: the owner too, where more than one project shares the name.
+- `@mylib@acme@gitlab.com`: the host too, where the same owner name exists on more than one.
+
+Golem drops the last field of an identity until something answers.
+
 ## Writing a recipe
 
 Read [Recipes](https://golemcpp.org/docs/advanced/recipes/) for what a recipe is and how it is named.
@@ -37,6 +45,8 @@ python -m pytest tests
 ```
 
 The tests use Golem itself to compose the identity and check the recipes have valid directory names.
+
+After `golem resolve`, Golem says which recipe served each dependency (e.g. `@json@nlohmann@github.com: served by @json@nlohmann@github.com (…)`) so you can confirm yours was reached rather than something above it.
 
 Three worth reading before writing one:
 
