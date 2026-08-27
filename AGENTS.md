@@ -21,6 +21,7 @@
   - `@json@nlohmann`: the owner too, where more than one project shares the name.
   - `@mylib@acme@gitlab.com`: the host too, where the same owner name exists on more than one.
 - The leading `@` is what tells a recipe from everything else this repository holds, therefore a directory without one is furniture and is never loaded as a recipe.
+- **A recipe declares where its package is, in a `recipe.json` beside its project file**, which is what lets a project write `location='@boost'` instead of the URL. The `locator` is what Golem hands git, never an identity. The directory name has to agree with the identity Golem composes for `locator`. Verify a new locator with `git ls-remote` while writing it; the tests never reach the network.
 - Keep changes minimal and recipe-local unless the task is explicitly about shared helper behavior.
 - **Write comments and docstrings plainly.** Start a function docstring with a verb, in the imperative: `Build the library and export its headers.`. Keep one idea per sentence, mark the step with `therefore`, `so` or `but`, and use the words Golem and the upstream build system already use. Explain why a recipe does something unusual, which is what the next reader cannot work out from the code. The full rules are in the `Writing Code` section of [../golem/AGENTS.md](../golem/AGENTS.md).
 

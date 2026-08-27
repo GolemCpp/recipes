@@ -19,9 +19,20 @@ To use a cookbook of your own instead, or in addition, see [Custom cookbooks](ht
 
 ## Layout
 
-One directory per dependency, named after the [source identity](https://golemcpp.org/docs/reference/source-identities/) of the repository it is a recipe for, each holding a `golemfile.py`.
+One directory per dependency, named after the [source identity](https://golemcpp.org/docs/reference/source-identities/) of the repository it is a recipe for, each holding a `golemfile.py` and a `recipe.json`.
 
 The leading `@` in a recipe directory name is what tells a recipe from everything else this repository holds.
+
+The `recipe.json` says where the package is:
+
+```json
+{
+  "version": 1,
+  "locator": "https://github.com/boostorg/boost.git"
+}
+```
+
+That is what lets a project name the package instead of its URL, writing `location='@boost'`. The directory name and the locator have to agree.
 
 A recipe is named at the qualification that makes it unambiguous, and no further:
 
@@ -37,14 +48,14 @@ Read [Recipes](https://golemcpp.org/docs/advanced/recipes/) for what a recipe is
 
 The quickest way to find the name a recipe needs is to let Golem ask for it. When no recipe matches, it names the identity it looked for, and a directory of that name is what answers.
 
-Before opening a pull request, check your directory corresponds to the identity being looked for:
+Before opening a pull request, check your directory corresponds to the identity being looked for, and that the locator you declared composes it:
 
 ```bash
 pip install golemcpp
 python -m pytest tests
 ```
 
-The tests use Golem itself to compose the identity and check the recipes have valid directory names.
+The tests use Golem itself to compose the identities and check the recipes have valid directory names. No network needed.
 
 After `golem resolve`, Golem says which recipe served each dependency (e.g. `@json@nlohmann@github.com: served by @json@nlohmann@github.com (…)`) so you can confirm yours was reached rather than something above it.
 
