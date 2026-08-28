@@ -8,8 +8,8 @@ import subprocess
 def configure(project):
 
     project.dependency(name='openssl',
-                       repository='https://github.com/openssl/openssl.git',
-                       version='~1.1.1',
+                       location='@openssl',
+                       version='*',
                        variant="release",
                        shallow=True)
 

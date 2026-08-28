@@ -50,9 +50,9 @@ def recipes():
 
 def declared_dependencies():
     '''
-    Pair every repository a recipe declares with the recipe declaring it.
+    Pair every identity a recipe declares with the recipe declaring it.
 
-    Read off the syntax tree rather than matched in the text, so a locator
+    Read off the syntax tree rather than matched in the text, so a location
     written over two lines is still found.
     '''
     found = set()
@@ -74,7 +74,7 @@ def declared_dependencies():
                 continue
 
             for keyword in node.keywords:
-                if keyword.arg != 'repository':
+                if keyword.arg != 'location':
                     continue
                 if isinstance(keyword.value, ast.Constant):
                     found.add((recipe, keyword.value.value))
@@ -170,17 +170,17 @@ def test_a_recipe_is_named_by_the_locator_it_declares(recipe):
     )
 
 
-@pytest.mark.parametrize('recipe, repository', declared_dependencies())
-def test_a_declared_dependency_finds_its_recipe(recipe, repository):
+@pytest.mark.parametrize('recipe, location', declared_dependencies())
+def test_a_declared_dependency_finds_its_recipe(recipe, location):
     '''
     Check a dependency a recipe declares resolves to a recipe here.
 
-    This is the agreement itself rather than the shape of a name: what is
-    reached is what a consumer reaches, by the same locator. Golem drops the
-    last field of an identity until something answers, so the rung that answers
-    may be shorter than the identity the locator composes.
+    A recipe names what it needs rather than where to get it, therefore the
+    identity is read from the location rather than composed from a locator.
+    Golem drops the last field until something serves it, so the rung reached
+    may be shorter than the identity written.
     '''
-    identity = SourceId.from_locator(repository)
+    identity = SourceId.parse(location)
 
     if str(identity) in DEPENDENCIES_WITHOUT_A_RECIPE:
         pytest.skip('{} ships its own project file'.format(identity))
@@ -189,11 +189,11 @@ def test_a_declared_dependency_finds_its_recipe(recipe, repository):
 
     assert answering, (
         "{} declares {}, which Golem looks up as '{}', and nothing here "
-        "answers it at any qualification ({}). Name a recipe at one of those, "
+        "serves it at any qualification ({}). Name a recipe at one of those, "
         "or list the identity in DEPENDENCIES_WITHOUT_A_RECIPE with the "
         "reason.".format(
             recipe,
-            repository,
+            location,
             identity,
             ', '.join(str(rung) for rung in identity.rungs()),
         )

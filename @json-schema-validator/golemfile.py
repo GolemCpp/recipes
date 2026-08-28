@@ -32,8 +32,8 @@ def configure(project):
         return artifacts
 
     project.dependency(name='json',
-                       repository='https://github.com/nlohmann/json.git',
-                       version='~3.7.0',
+                       location='@json@nlohmann',
+                       version='*',
                        variant="release",
                        shallow=True)
 

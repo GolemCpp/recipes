@@ -6,15 +6,15 @@ def configure(project):
     project.dependency(
         name='boost',
         targets=["boost_system", "boost_date_time", "boost_regex"],
-        repository='https://github.com/boostorg/boost.git',
-        version='~1.69.0',
+        location='@boost',
+        version='*',
         variant='release',
         shallow=True,
         link='static')
 
     project.dependency(name='openssl',
-                       repository='https://github.com/openssl/openssl.git',
-                       version='~1.1.1',
+                       location='@openssl',
+                       version='*',
                        variant="release",
                        shallow=True)
 

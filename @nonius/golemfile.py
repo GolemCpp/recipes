@@ -6,8 +6,8 @@ def configure(project):
 
     project.dependency(name='boost',
                        targets=["boost_system"],
-                       repository='https://github.com/boostorg/boost.git',
-                       version='~1.69.0',
+                       location='@boost',
+                       version='*',
                        variant='release',
                        shallow=True)
 

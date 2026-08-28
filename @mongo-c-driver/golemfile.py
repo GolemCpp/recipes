@@ -27,14 +27,14 @@ def configure(project):
         return artifacts
 
     project.dependency(name='zlib',
-                       repository='https://github.com/madler/zlib.git',
-                       version='~1.2.11',
+                       location='@zlib',
+                       version='*',
                        variant="release",
                        shallow=True)
 
     project.dependency(name='openssl',
-                       repository='https://github.com/openssl/openssl.git',
-                       version='~1.1.1',
+                       location='@openssl',
+                       version='*',
                        variant="release",
                        shallow=True)
 

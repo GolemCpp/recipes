@@ -31,8 +31,8 @@ def configure(project):
 
     project.dependency(
         name='mongo-c-driver',
-        repository='https://github.com/mongodb/mongo-c-driver.git',
-        version='~1.17.0',
+        location='@mongo-c-driver',
+        version='*',
         variant='release')
 
     target = project.library(name='mongo-cxx-driver',

@@ -4,8 +4,8 @@
 def configure(project):
 
     project.dependency(name='zlib',
-                       repository='https://github.com/madler/zlib.git',
-                       version='~1.2.11',
+                       location='@zlib',
+                       version='*',
                        variant="release",
                        shallow=True)
 
@@ -15,14 +15,14 @@ def configure(project):
                            "boost_chrono", "boost_thread", "boost_random",
                            "boost_atomic", "boost_date_time", "boost_regex"
                        ],
-                       repository='https://github.com/boostorg/boost.git',
-                       version='~1.69.0',
+                       location='@boost',
+                       version='*',
                        variant='release',
                        shallow=True)
 
     project.dependency(name='openssl',
-                       repository='https://github.com/openssl/openssl.git',
-                       version='~1.1.1',
+                       location='@openssl',
+                       version='*',
                        variant="release",
                        shallow=True)
 
