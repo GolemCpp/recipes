@@ -61,7 +61,7 @@ def script(ctx):
     source_path = ctx.get_project_dir()
 
     cmake_env = {
-        'NLOHMANN_JSON_VERSION': json.resolved.reference
+        'NLOHMANN_JSON_VERSION': json.resolved.version.reference
     }
     
     cmake_options = []
