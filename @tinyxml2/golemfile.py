@@ -10,23 +10,23 @@ def configure(project):
         for suffix in context.artifact_suffix(config):
             artifact = context.artifact_prefix(config) + decorated_target + suffix
             artifacts.append(artifact)
-            if suffix == '.so':
-                artifacts.append('{}.{}'.format(artifact, context.version.major))
+            if suffix == ".so":
+                artifacts.append("{}.{}".format(artifact, context.version.major))
                 artifacts.append(
-                    '{}.{}.{}.{}'.format(
+                    "{}.{}.{}.{}".format(
                         artifact,
                         context.version.major,
                         context.version.minor,
                         context.version.patch,
                     )
                 )
-            elif suffix == '.dylib':
+            elif suffix == ".dylib":
                 basename_prefix = context.artifact_prefix(config) + decorated_target
                 artifacts.append(
-                    '{}.{}.dylib'.format(basename_prefix, context.version.major)
+                    "{}.{}.dylib".format(basename_prefix, context.version.major)
                 )
                 artifacts.append(
-                    '{}.{}.{}.{}.dylib'.format(
+                    "{}.{}.{}.{}.dylib".format(
                         basename_prefix,
                         context.version.major,
                         context.version.minor,
@@ -36,14 +36,14 @@ def configure(project):
         return artifacts
 
     target = project.library(
-        name='tinyxml2', scripts=[script], artifacts_generators=[artifacts_generator]
+        name="tinyxml2", scripts=[script], artifacts_generators=[artifacts_generator]
     )
 
-    target.when(variant='debug', targets=['tinyxml2d'])
-    target.when(variant='release', targets=['tinyxml2'])
+    target.when(variant="debug", targets=["tinyxml2d"])
+    target.when(variant="release", targets=["tinyxml2"])
 
     target = project.export(
-        name='tinyxml2', includes=['include'], licenses=['LICENSE.txt']
+        name="tinyxml2", includes=["include"], licenses=["LICENSE.txt"]
     )
 
 
@@ -57,32 +57,32 @@ def script(ctx):
 
     variant = None
     if ctx.is_debug():
-        variant = 'Debug'
+        variant = "Debug"
     else:
-        variant = 'Release'
+        variant = "Release"
 
-    opt_variant = '-DCMAKE_BUILD_TYPE=' + variant
+    opt_variant = "-DCMAKE_BUILD_TYPE=" + variant
 
-    opt_target_shared = '-DBUILD_SHARED_LIBS:BOOL='
+    opt_target_shared = "-DBUILD_SHARED_LIBS:BOOL="
     if ctx.is_static():
-        opt_target_shared += 'OFF'
+        opt_target_shared += "OFF"
     else:
-        opt_target_shared += 'ON'
+        opt_target_shared += "ON"
 
-    opt_target_static = '-DBUILD_STATIC_LIBS:BOOL='
+    opt_target_static = "-DBUILD_STATIC_LIBS:BOOL="
     if ctx.is_static():
-        opt_target_static += 'ON'
+        opt_target_static += "ON"
     else:
-        opt_target_static += 'OFF'
+        opt_target_static += "OFF"
 
     opt_target = [opt_target_shared, opt_target_static]
 
-    opt_arch = ['-A', ctx.vs_platform()] if ctx.is_windows() else []
+    opt_arch = ["-A", ctx.vs_platform()] if ctx.is_windows() else []
 
     ret = subprocess.call(
-        ['cmake', src_dir]
+        ["cmake", src_dir]
         + opt_arch
-        + [opt_variant, '-DBUILD_TESTS:BOOL=OFF']
+        + [opt_variant, "-DBUILD_TESTS:BOOL=OFF"]
         + opt_target,
         cwd=target_dir,
     )
@@ -91,7 +91,7 @@ def script(ctx):
         return
 
     ret = subprocess.call(
-        ['cmake', '--build', '.', '--config', variant], cwd=target_dir
+        ["cmake", "--build", ".", "--config", variant], cwd=target_dir
     )
     if ret:
         print("ERROR: cmake --build")
@@ -105,7 +105,7 @@ def script(ctx):
     else:
         ctx.copy_binary_artifacts_from_build(os.path.join(target_dir), out_path)
 
-    include_dir = os.path.join(src_dir, 'include')
+    include_dir = os.path.join(src_dir, "include")
     if not os.path.exists(include_dir):
         os.makedirs(include_dir)
-    shutil.copy2(os.path.join(src_dir, 'tinyxml2.h'), include_dir)
+    shutil.copy2(os.path.join(src_dir, "tinyxml2.h"), include_dir)

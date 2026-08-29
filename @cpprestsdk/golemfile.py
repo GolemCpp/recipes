@@ -1,11 +1,11 @@
 def configure(project):
 
     project.dependency(
-        name='zlib', location='@zlib', version='*', variant="release", shallow=True
+        name="zlib", location="@zlib", version="*", variant="release", shallow=True
     )
 
     project.dependency(
-        name='boost',
+        name="boost",
         targets=[
             "boost_system",
             "boost_filesystem",
@@ -17,16 +17,16 @@ def configure(project):
             "boost_date_time",
             "boost_regex",
         ],
-        location='@boost',
-        version='*',
-        variant='release',
+        location="@boost",
+        version="*",
+        variant="release",
         shallow=True,
     )
 
     project.dependency(
-        name='openssl',
-        location='@openssl',
-        version='*',
+        name="openssl",
+        location="@openssl",
+        version="*",
         variant="release",
         shallow=True,
     )
@@ -36,33 +36,33 @@ def configure(project):
         for suffix in context.artifact_suffix(config):
             artifact = context.artifact_prefix(config) + decorated_target + suffix
             artifacts.append(artifact)
-            if suffix == '.so':
+            if suffix == ".so":
                 artifacts.append(
-                    '{}.{}.{}'.format(
+                    "{}.{}.{}".format(
                         artifact, context.version.major, context.version.minor
                     )
                 )
-            elif suffix == '.dylib':
+            elif suffix == ".dylib":
                 basename_prefix = context.artifact_prefix(config) + decorated_target
                 artifacts.append(
-                    '{}.{}.{}.dylib'.format(
+                    "{}.{}.{}.dylib".format(
                         basename_prefix, context.version.major, context.version.minor
                     )
                 )
         return artifacts
 
     project.library(
-        name='cpprest',
-        deps=['boost', 'openssl', 'zlib'],
+        name="cpprest",
+        deps=["boost", "openssl", "zlib"],
         scripts=[script],
         artifacts_generators=[artifacts_generator],
     )
 
     project.export(
-        name='cpprest',
-        includes=['Release/include'],
-        licenses=['license.txt', 'ThirdPartyNotices.txt'],
-        deps=['boost', 'openssl', 'zlib'],
+        name="cpprest",
+        includes=["Release/include"],
+        licenses=["license.txt", "ThirdPartyNotices.txt"],
+        deps=["boost", "openssl", "zlib"],
     )
 
 
@@ -74,7 +74,7 @@ import subprocess
 
 def script(ctx):
 
-    cpprest_dir = ctx.make_project_path('Release')
+    cpprest_dir = ctx.make_project_path("Release")
 
     target_dir = ctx.context.out_dir
     if not os.path.exists(target_dir):
@@ -82,65 +82,65 @@ def script(ctx):
 
     variant = None
     if ctx.is_debug():
-        variant = 'Debug'
+        variant = "Debug"
     else:
-        variant = 'Release'
+        variant = "Release"
 
-    opt_variant = '-DCMAKE_BUILD_TYPE=' + variant
+    opt_variant = "-DCMAKE_BUILD_TYPE=" + variant
 
-    opt_target = '-DBUILD_SHARED_LIBS='
+    opt_target = "-DBUILD_SHARED_LIBS="
     if ctx.is_static():
-        opt_target += '0'
+        opt_target += "0"
     else:
-        opt_target += '1'
+        opt_target += "1"
 
-    opt_arch = ['-A', ctx.vs_platform()] if ctx.is_windows() else []
+    opt_arch = ["-A", ctx.vs_platform()] if ctx.is_windows() else []
 
     opt_deps = []
 
-    zlib_libs = ctx.find_dependency_libraries_files(dep_name='zlib', target_name='z')
+    zlib_libs = ctx.find_dependency_libraries_files(dep_name="zlib", target_name="z")
     crypto_libs = ctx.find_dependency_libraries_files(
-        dep_name='openssl', target_name='crypto'
+        dep_name="openssl", target_name="crypto"
     )
     ssl_libs = ctx.find_dependency_libraries_files(
-        dep_name='openssl', target_name='ssl'
+        dep_name="openssl", target_name="ssl"
     )
     ssl_libraries = ssl_libs[0] + ";" + crypto_libs[0]
 
     opt_deps += [
-        '-DBOOST_LIBRARYDIR=' + ctx.find_dependency_libraries('boost')[0],
-        '-DBOOST_INCLUDEDIR=' + ctx.find_dependency_includes('boost')[0],
-        '-DBoost_NO_SYSTEM_PATHS=ON',
-        '-DZLIB_LIBRARY=' + zlib_libs[0],
-        '-DZLIB_INCLUDE_DIR=' + ctx.find_dependency_includes('zlib')[0],
-        '-DOPENSSL_LIBRARIES=' + ssl_libraries,
-        '-DOPENSSL_ROOT_DIR=' + ctx.find_dependency_libraries('openssl')[0],
-        '-DOPENSSL_CRYPTO_LIBRARY=' + crypto_libs[0],
-        '-DOPENSSL_SSL_LIBRARY=' + ssl_libs[0],
-        '-DOPENSSL_INCLUDE_DIR=' + ctx.find_dependency_includes('openssl')[0],
-        '-DWERROR=OFF',
+        "-DBOOST_LIBRARYDIR=" + ctx.find_dependency_libraries("boost")[0],
+        "-DBOOST_INCLUDEDIR=" + ctx.find_dependency_includes("boost")[0],
+        "-DBoost_NO_SYSTEM_PATHS=ON",
+        "-DZLIB_LIBRARY=" + zlib_libs[0],
+        "-DZLIB_INCLUDE_DIR=" + ctx.find_dependency_includes("zlib")[0],
+        "-DOPENSSL_LIBRARIES=" + ssl_libraries,
+        "-DOPENSSL_ROOT_DIR=" + ctx.find_dependency_libraries("openssl")[0],
+        "-DOPENSSL_CRYPTO_LIBRARY=" + crypto_libs[0],
+        "-DOPENSSL_SSL_LIBRARY=" + ssl_libs[0],
+        "-DOPENSSL_INCLUDE_DIR=" + ctx.find_dependency_includes("openssl")[0],
+        "-DWERROR=OFF",
     ]
 
     command = (
-        ['cmake', cpprest_dir]
+        ["cmake", cpprest_dir]
         + opt_arch
         + [
             opt_variant,
             opt_target,
-            '-DCPPREST_EXCLUDE_WEBSOCKETS=1',
-            '-DCPPREST_ABI_TAG=',
+            "-DCPPREST_EXCLUDE_WEBSOCKETS=1",
+            "-DCPPREST_ABI_TAG=",
         ]
         + opt_deps
     )
 
-    print(' '.join(command))
+    print(" ".join(command))
 
     ret = subprocess.call(command, cwd=target_dir)
     if ret:
         raise RuntimeError("ERROR: cmake")
 
     ret = subprocess.call(
-        ['cmake', '--build', '.', '--target', 'cpprest', '--config', variant],
+        ["cmake", "--build", ".", "--target", "cpprest", "--config", variant],
         cwd=target_dir,
     )
     if ret:
@@ -148,9 +148,9 @@ def script(ctx):
 
     out_path = ctx.make_out_path()
 
-    binaries_directory = os.path.join(ctx.context.out_dir, 'Binaries')
+    binaries_directory = os.path.join(ctx.context.out_dir, "Binaries")
 
     if ctx.is_windows():
-        binaries_directory = os.path.join(binaries_directory, 'Release')
+        binaries_directory = os.path.join(binaries_directory, "Release")
 
     ctx.copy_binary_artifacts_from_build(binaries_directory, out_path)

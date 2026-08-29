@@ -11,87 +11,87 @@ import sys
 def configure(project):
 
     target = project.export(
-        name='cinder', targets=['cinder'], includes=['Cinder/include']
+        name="cinder", targets=["cinder"], includes=["Cinder/include"]
     )
 
     target.when(
-        osystem='linux',
-        defines=['FT2_BUILD_LIBRARY', 'FT_DEBUG_LEVEL_TRACE', '_GLFW_X11', '_UNIX'],
+        osystem="linux",
+        defines=["FT2_BUILD_LIBRARY", "FT_DEBUG_LEVEL_TRACE", "_GLFW_X11", "_UNIX"],
     )
 
     target.when(
-        osystem='linux',
+        osystem="linux",
         system=[
-            'GLU',
-            'GL',
-            'SM',
-            'ICE',
-            'X11',
-            'Xext',
-            'Xcursor',
-            'Xinerama',
-            'Xrandr',
-            'Xi',
-            'z',
-            'curl',
-            'fontconfig',
-            'pulse',
-            'mpg123',
-            'sndfile',
-            'gobject-2.0',
-            'glib-2.0',
-            'gstreamer-1.0',
-            'gstbase-1.0',
-            'gstapp-1.0',
-            'gstvideo-1.0',
-            'gstgl-1.0',
-            'boost_system',
-            'boost_filesystem',
-            'dl',
+            "GLU",
+            "GL",
+            "SM",
+            "ICE",
+            "X11",
+            "Xext",
+            "Xcursor",
+            "Xinerama",
+            "Xrandr",
+            "Xi",
+            "z",
+            "curl",
+            "fontconfig",
+            "pulse",
+            "mpg123",
+            "sndfile",
+            "gobject-2.0",
+            "glib-2.0",
+            "gstreamer-1.0",
+            "gstbase-1.0",
+            "gstapp-1.0",
+            "gstvideo-1.0",
+            "gstgl-1.0",
+            "boost_system",
+            "boost_filesystem",
+            "dl",
         ],
     )
 
     target.when(
-        osystem='linux',
-        distribution='debian',
-        release='buster',
+        osystem="linux",
+        distribution="debian",
+        release="buster",
         packages=[
-            'libcurl4',
-            'libfontconfig1',
-            'libpulse0',
-            'libmpg123-0',
-            'libsndfile1',
-            'libgstreamer1.0-0',
-            'libgstreamer-plugins-base1.0-0',
-            'libxrandr2',
-            'libxcursor1',
-            'libxinerama1',
-            'libxi6',
-            'libsm6',
+            "libcurl4",
+            "libfontconfig1",
+            "libpulse0",
+            "libmpg123-0",
+            "libsndfile1",
+            "libgstreamer1.0-0",
+            "libgstreamer-plugins-base1.0-0",
+            "libxrandr2",
+            "libxcursor1",
+            "libxinerama1",
+            "libxi6",
+            "libsm6",
         ],
         packages_dev=[
-            'libcurl4-openssl-dev',
-            'libfontconfig1-dev',
-            'libpulse-dev',
-            'libmpg123-dev',
-            'libsndfile1-dev',
-            'libgstreamer1.0-dev',
-            'libgstreamer-plugins-base1.0-dev',
-            'libxrandr-dev',
-            'libxcursor-dev',
-            'libxinerama-dev',
-            'libxi-dev',
-            'libsm-dev',
+            "libcurl4-openssl-dev",
+            "libfontconfig1-dev",
+            "libpulse-dev",
+            "libmpg123-dev",
+            "libsndfile1-dev",
+            "libgstreamer1.0-dev",
+            "libgstreamer-plugins-base1.0-dev",
+            "libxrandr-dev",
+            "libxcursor-dev",
+            "libxinerama-dev",
+            "libxi-dev",
+            "libsm-dev",
         ],
     )
 
-    target.when(osystem='windows', defines=['CINDER_SHARED'])
+    target.when(osystem="windows", defines=["CINDER_SHARED"])
 
 
 def line_in_file(file_path, text):
 
     linelist = []
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         linelist = file.readlines()
 
     found = False
@@ -101,42 +101,42 @@ def line_in_file(file_path, text):
             break
 
     if not found:
-        with open(file_path, 'a') as file:
+        with open(file_path, "a") as file:
             file.write(text + "\n")
 
 
 def patch_cmake_for_windows(cinder_dir):
-    cmake_path = os.path.join(cinder_dir, 'proj', 'cmake', 'platform_msw.cmake')
+    cmake_path = os.path.join(cinder_dir, "proj", "cmake", "platform_msw.cmake")
     line_in_file(
-        cmake_path, 'include( ${CMAKE_CURRENT_LIST_DIR}/platform_msw_patch.cmake )'
+        cmake_path, "include( ${CMAKE_CURRENT_LIST_DIR}/platform_msw_patch.cmake )"
     )
 
-    patch_path = os.path.join(cinder_dir, 'proj', 'cmake', 'platform_msw_patch.cmake')
+    patch_path = os.path.join(cinder_dir, "proj", "cmake", "platform_msw_patch.cmake")
 
-    with open(patch_path, 'w+') as file:
+    with open(patch_path, "w+") as file:
         file.writelines(
             [
-                'list( APPEND CINDER_SRC_FILES ${CINDER_SRC_DIR}/videoInput/videoInput.cpp )'
+                "list( APPEND CINDER_SRC_FILES ${CINDER_SRC_DIR}/videoInput/videoInput.cpp )"
                 + "\n",
-                'list( REMOVE_ITEM CINDER_SRC_FILES ${CINDER_SRC_DIR}/cinder/app/AppScreenSaver.cpp )'
+                "list( REMOVE_ITEM CINDER_SRC_FILES ${CINDER_SRC_DIR}/cinder/app/AppScreenSaver.cpp )"
                 + "\n",
-                'list( REMOVE_ITEM CINDER_SRC_FILES ${CINDER_SRC_DIR}/cinder/app/msw/AppImplMswScreenSaver.cpp )'
+                "list( REMOVE_ITEM CINDER_SRC_FILES ${CINDER_SRC_DIR}/cinder/app/msw/AppImplMswScreenSaver.cpp )"
                 + "\n",
                 'list( APPEND CINDER_DEFINES "CINDER_SHARED_BUILD;JSON_DLL_BUILD" )'
-                + '\n',
-                'foreach( ' + "\n",
-                'flag_var' + "\n",
-                'CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO '
                 + "\n",
-                'CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO '
+                "foreach( " + "\n",
+                "flag_var" + "\n",
+                "CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO "
                 + "\n",
-                ')' + "\n",
+                "CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO "
+                + "\n",
+                ")" + "\n",
                 'if( ${flag_var} MATCHES "/MT" )' + "\n",
                 'string( REGEX REPLACE "/MT" "/MD" ${flag_var} "${${flag_var}}" )'
                 + "\n",
-                'endif()' + "\n",
-                'endforeach()' + "\n",
-                'include_directories( ${CINDER_SRC_DIR}/../include/msw )' + '\n',
+                "endif()" + "\n",
+                "endforeach()" + "\n",
+                "include_directories( ${CINDER_SRC_DIR}/../include/msw )" + "\n",
                 'set( CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /LIBPATH:..\\\\..\\\\lib\\\\msw\\\\x64 /DYNAMICBASE ${MSW_PLATFORM_LIBS} /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT" )'
                 + "\n",
             ]
@@ -145,15 +145,15 @@ def patch_cmake_for_windows(cinder_dir):
 
 def patch_pull_request_2070(ctx):
     shutil.copy(
-        ctx.make_project_path(os.path.join('patch', '_int_glx_type.h')),
+        ctx.make_project_path(os.path.join("patch", "_int_glx_type.h")),
         ctx.make_project_path(
-            os.path.join('Cinder', 'include', 'glload', '_int_glx_type.h')
+            os.path.join("Cinder", "include", "glload", "_int_glx_type.h")
         ),
     )
     shutil.copy(
-        ctx.make_project_path(os.path.join('patch', '_int_glx_type.hpp')),
+        ctx.make_project_path(os.path.join("patch", "_int_glx_type.hpp")),
         ctx.make_project_path(
-            os.path.join('Cinder', 'include', 'glload', '_int_glx_type.hpp')
+            os.path.join("Cinder", "include", "glload", "_int_glx_type.hpp")
         ),
     )
 
@@ -162,7 +162,7 @@ def replace_in_file(file_path, pattern, subst):
 
     # Create temp file
     fh, abs_path = mkstemp()
-    with fdopen(fh, 'w') as new_file:
+    with fdopen(fh, "w") as new_file:
         with open(file_path) as old_file:
             for line in old_file:
                 new_file.write(line.replace(pattern, subst))
@@ -176,12 +176,12 @@ def replace_in_file(file_path, pattern, subst):
 
 def patch_src_for_windows(cinder_dir):
     file_include_params_params = os.path.join(
-        cinder_dir, 'include', 'cinder', 'params', 'Params.h'
+        cinder_dir, "include", "cinder", "params", "Params.h"
     )
     replace_in_file(
-        file_include_params_params, 'class CI_API Options :', 'class Options :'
+        file_include_params_params, "class CI_API Options :", "class Options :"
     )
-    replace_in_file(file_include_params_params, 'Options&', 'inline Options&')
+    replace_in_file(file_include_params_params, "Options&", "inline Options&")
 
 
 def script(ctx):
@@ -190,25 +190,25 @@ def script(ctx):
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
 
-    cinder_dir = ctx.make_project_path('Cinder')
+    cinder_dir = ctx.make_project_path("Cinder")
 
     variant = None
     if ctx.is_debug():
-        variant = 'Debug'
+        variant = "Debug"
     else:
-        variant = 'Release'
+        variant = "Release"
 
-    opt_variant = '-DCMAKE_BUILD_TYPE=' + variant
+    opt_variant = "-DCMAKE_BUILD_TYPE=" + variant
 
-    opt_target = '-DBUILD_SHARED_LIBS='
+    opt_target = "-DBUILD_SHARED_LIBS="
     if ctx.is_static():
-        opt_target += '0'
+        opt_target += "0"
     else:
-        opt_target += '1'
+        opt_target += "1"
 
     opt_windows = []
     if ctx.is_windows():
-        opt_windows += ['-A', ctx.vs_platform()]
+        opt_windows += ["-A", ctx.vs_platform()]
         patch_src_for_windows(cinder_dir)
         patch_cmake_for_windows(cinder_dir)
 
@@ -216,16 +216,16 @@ def script(ctx):
 
     opt_linux = []
     if ctx.is_linux():
-        opt_linux.append('-DCINDER_BOOST_USE_SYSTEM=1')
+        opt_linux.append("-DCINDER_BOOST_USE_SYSTEM=1")
 
-    cmd = ['cmake', cinder_dir] + [opt_variant, opt_target] + opt_linux + opt_windows
+    cmd = ["cmake", cinder_dir] + [opt_variant, opt_target] + opt_linux + opt_windows
     print(cmd)
     ret = subprocess.call(cmd, cwd=target_dir)
     if ret:
         print("ERROR: cmake")
         return
 
-    cmd = ['cmake', '--build', '.', '--config', variant]
+    cmd = ["cmake", "--build", ".", "--config", variant]
     print(cmd)
     ret = subprocess.call(cmd, cwd=target_dir)
     if ret:
@@ -236,7 +236,7 @@ def script(ctx):
 
     if ctx.is_linux():
         ctx.copy_binary_artifacts_from_build(
-            os.path.join(cinder_dir, 'lib', 'linux', 'x86_64', 'ogl', variant), out_path
+            os.path.join(cinder_dir, "lib", "linux", "x86_64", "ogl", variant), out_path
         )
 
     elif ctx.is_windows():
@@ -245,15 +245,15 @@ def script(ctx):
         # the directory.
         path = os.path.join(
             cinder_dir,
-            'lib',
-            'msw',
-            'x64' if ctx.get_arch() == 'x86_64' else 'x86',
+            "lib",
+            "msw",
+            "x64" if ctx.get_arch() == "x86_64" else "x86",
             variant,
         )
-        full_paths = glob(path + '/*')
+        full_paths = glob(path + "/*")
         for path in full_paths:
             if os.path.basename(os.path.normpath(path)).startswith(
-                'v'
+                "v"
             ) and os.path.isdir(path):
                 ctx.copy_binary_artifacts_from_build(path, out_path)
 

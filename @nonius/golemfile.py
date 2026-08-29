@@ -1,18 +1,18 @@
 def configure(project):
 
     project.dependency(
-        name='boost',
+        name="boost",
         targets=["boost_system"],
-        location='@boost',
-        version='*',
-        variant='release',
+        location="@boost",
+        version="*",
+        variant="release",
         shallow=True,
     )
 
     project.export(
-        name='nonius',
-        includes=['include'],
+        name="nonius",
+        includes=["include"],
         header_only=True,
-        licenses=['COPYING.txt'],
-        deps=['boost'],
+        licenses=["COPYING.txt"],
+        deps=["boost"],
     )

@@ -8,18 +8,18 @@ import glob
 def configure(project):
 
     project.dependency(
-        name='boost',
+        name="boost",
         targets=["boost_system"],
-        location='@boost',
-        version='*',
-        variant='release',
+        location="@boost",
+        version="*",
+        variant="release",
         shallow=True,
     )
 
-    project.library(name='bustache', scripts=[script], deps=['boost'])
+    project.library(name="bustache", scripts=[script], deps=["boost"])
 
     project.export(
-        name='bustache', includes=['include'], deps=['boost'], licenses=['README.md']
+        name="bustache", includes=["include"], deps=["boost"], licenses=["README.md"]
     )
 
 
@@ -33,35 +33,35 @@ def script(ctx):
 
     variant = None
     if ctx.is_debug():
-        variant = 'Debug'
+        variant = "Debug"
     else:
-        variant = 'Release'
+        variant = "Release"
 
-    opt_variant = '-DCMAKE_BUILD_TYPE=' + variant
+    opt_variant = "-DCMAKE_BUILD_TYPE=" + variant
 
-    opt_target = '-DBUILD_SHARED_LIBS='
+    opt_target = "-DBUILD_SHARED_LIBS="
     if ctx.is_static():
-        opt_target += '0'
+        opt_target += "0"
     else:
-        opt_target += '1'
+        opt_target += "1"
 
-    opt_arch = ['-A', ctx.vs_platform()] if ctx.is_windows() else []
+    opt_arch = ["-A", ctx.vs_platform()] if ctx.is_windows() else []
 
     boost_options = [
-        '-DBOOST_LIBRARYDIR=' + ctx.find_dependency_libraries('boost')[0],
-        '-DBOOST_INCLUDEDIR=' + ctx.find_dependency_includes('boost')[0],
-        '-DBoost_NO_SYSTEM_PATHS=ON',
+        "-DBOOST_LIBRARYDIR=" + ctx.find_dependency_libraries("boost")[0],
+        "-DBOOST_INCLUDEDIR=" + ctx.find_dependency_includes("boost")[0],
+        "-DBoost_NO_SYSTEM_PATHS=ON",
     ]
 
     ret = subprocess.call(
-        ['cmake', bustache_dir] + boost_options + opt_arch + [opt_variant, opt_target],
+        ["cmake", bustache_dir] + boost_options + opt_arch + [opt_variant, opt_target],
         cwd=target_dir,
     )
     if ret:
         raise RuntimeError("ERROR: cmake")
 
     ret = subprocess.call(
-        ['cmake', '--build', '.', '--target', 'bustache', '--config', variant],
+        ["cmake", "--build", ".", "--target", "bustache", "--config", variant],
         cwd=target_dir,
     )
     if ret:

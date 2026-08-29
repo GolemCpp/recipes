@@ -8,42 +8,42 @@ import shutil
 def configure(project):
 
     targets = [
-        'boost_atomic',
-        'boost_chrono',
-        'boost_container',
-        'boost_context',
-        'boost_coroutine',
-        'boost_date_time',
-        'boost_fiber',
-        'boost_filesystem',
-        'boost_graph',
-        'boost_iostreams',
-        'boost_locale',
-        'boost_log_setup',
-        'boost_log',
-        'boost_math_c99f',
-        'boost_math_c99l',
-        'boost_math_c99',
-        'boost_math_tr1f',
-        'boost_math_tr1l',
-        'boost_math_tr1',
-        'boost_prg_exec_monitor',
-        'boost_program_options',
-        'boost_random',
-        'boost_regex',
-        'boost_serialization',
-        'boost_system',
-        'boost_thread',
-        'boost_timer',
-        'boost_type_erasure',
-        'boost_unit_test_framework',
-        'boost_wave',
-        'boost_wserialization',
+        "boost_atomic",
+        "boost_chrono",
+        "boost_container",
+        "boost_context",
+        "boost_coroutine",
+        "boost_date_time",
+        "boost_fiber",
+        "boost_filesystem",
+        "boost_graph",
+        "boost_iostreams",
+        "boost_locale",
+        "boost_log_setup",
+        "boost_log",
+        "boost_math_c99f",
+        "boost_math_c99l",
+        "boost_math_c99",
+        "boost_math_tr1f",
+        "boost_math_tr1l",
+        "boost_math_tr1",
+        "boost_prg_exec_monitor",
+        "boost_program_options",
+        "boost_random",
+        "boost_regex",
+        "boost_serialization",
+        "boost_system",
+        "boost_thread",
+        "boost_timer",
+        "boost_type_erasure",
+        "boost_unit_test_framework",
+        "boost_wave",
+        "boost_wserialization",
     ]
 
     def target_decorator(target_name, config, context):
         if context.is_static() and context.is_windows():
-            target_name = 'lib' + target_name
+            target_name = "lib" + target_name
         return target_name
 
     def artifacts_generator(decorated_target, config, context):
@@ -54,18 +54,18 @@ def configure(project):
             if (
                 context.is_static()
                 and context.is_windows()
-                and suffix != '.lib'
-                and artifact.startswith('lib')
+                and suffix != ".lib"
+                and artifact.startswith("lib")
             ):
                 artifact = artifact[3:]
 
             artifacts.append(artifact)
-            if suffix == '.so':
-                artifacts.append('{}.{}'.format(artifact, context.version.semver_short))
+            if suffix == ".so":
+                artifacts.append("{}.{}".format(artifact, context.version.semver_short))
         return artifacts
 
     project.library(
-        name='boost',
+        name="boost",
         targets=targets,
         scripts=[script],
         target_decorators=[target_decorator],
@@ -73,16 +73,16 @@ def configure(project):
     )
 
     task = project.export(
-        name='boost',
-        includes=['include'],
+        name="boost",
+        includes=["include"],
         defines=[
-            'BOOST_ASIO_DISABLE_THREAD_KEYWORD_EXTENSION',
-            'BOOST_AUTO_LINK_NOMANGLE',
+            "BOOST_ASIO_DISABLE_THREAD_KEYWORD_EXTENSION",
+            "BOOST_AUTO_LINK_NOMANGLE",
         ],
-        licenses='LICENSE_1_0.txt',
+        licenses="LICENSE_1_0.txt",
     )
 
-    task.when(osystem=['windows'], link=['static'], defines=['BOOST_ALL_NO_LIB'])
+    task.when(osystem=["windows"], link=["static"], defines=["BOOST_ALL_NO_LIB"])
 
     # NOTE: Not available on Windows
     # 'boost_signals'
@@ -107,15 +107,15 @@ def script(ctx):
     target_dir = ctx.context.out_dir
 
     bootstrap_opt_libs = []
-    bootstrap_opt_libs.append('--without-libraries=python')
+    bootstrap_opt_libs.append("--without-libraries=python")
 
-    msvc_cmd = ''
+    msvc_cmd = ""
     if ctx.is_windows():
         msvc_cmd = ctx.msvc_vcvars_cmd()
 
-    bootstrap_bin = 'bootstrap.bat' if ctx.is_windows() else './bootstrap.sh'
+    bootstrap_bin = "bootstrap.bat" if ctx.is_windows() else "./bootstrap.sh"
 
-    cmd = msvc_cmd + ' '.join([bootstrap_bin] + bootstrap_opt_libs)
+    cmd = msvc_cmd + " ".join([bootstrap_bin] + bootstrap_opt_libs)
 
     if ctx.is_windows():
         cmd = 'cmd /V /C "{}"'.format(cmd)
@@ -125,8 +125,8 @@ def script(ctx):
     if ret:
         raise RuntimeError("ERROR: " + bootstrap_bin)
 
-    boost_build_dir = os.path.join(target_dir, 'boost-build')
-    boost_stage_dir = os.path.join(target_dir, 'boost-stage')
+    boost_build_dir = os.path.join(target_dir, "boost-build")
+    boost_stage_dir = os.path.join(target_dir, "boost-stage")
 
     if os.path.exists(boost_build_dir):
         shutil.rmtree(boost_build_dir)
@@ -134,42 +134,42 @@ def script(ctx):
     if os.path.exists(boost_stage_dir):
         shutil.rmtree(boost_stage_dir)
 
-    opt_dirs = ['--build-dir=' + boost_build_dir, '--stagedir=' + boost_stage_dir]
+    opt_dirs = ["--build-dir=" + boost_build_dir, "--stagedir=" + boost_stage_dir]
 
-    opt_variant = 'variant='
+    opt_variant = "variant="
     if ctx.is_debug():
-        opt_variant += 'debug'
+        opt_variant += "debug"
     else:
-        opt_variant += 'release'
+        opt_variant += "release"
 
     # b2 asks for a pointer width rather than an architecture, and that
     # spelling is Boost's. Off x86 it would also need `architecture=`, which
     # this recipe does not supply, so it builds for x86 only.
-    opt_arch = 'address-model=' + ('64' if ctx.get_arch() == 'x86_64' else '32')
+    opt_arch = "address-model=" + ("64" if ctx.get_arch() == "x86_64" else "32")
 
-    opt_runtime = 'runtime-link=' + ctx.runtime()
-    opt_link = 'link=' + ctx.link()
+    opt_runtime = "runtime-link=" + ctx.runtime()
+    opt_link = "link=" + ctx.link()
 
     opt_libs = []
-    opt_libs.append('--without-python')
+    opt_libs.append("--without-python")
 
     opt_headers = []
     if not ctx.is_windows():
-        opt_headers = ['headers']
+        opt_headers = ["headers"]
 
     if ctx.is_windows():
         msvc_cmd += 'set "VS150COMNTOOLS=!VS160COMNTOOLS!" && '  # workaround
 
     prefix_dir = make_install_path(ctx)
 
-    b2_bin = 'b2' if ctx.is_windows() else './b2'
-    cmd = msvc_cmd + ' '.join(
+    b2_bin = "b2" if ctx.is_windows() else "./b2"
+    cmd = msvc_cmd + " ".join(
         [
             b2_bin,
-            '-a',
-            '-j' + str(multiprocessing.cpu_count()),
-            '--layout=system',
-            'define=BOOST_ASIO_DISABLE_THREAD_KEYWORD_EXTENSION',
+            "-a",
+            "-j" + str(multiprocessing.cpu_count()),
+            "--layout=system",
+            "define=BOOST_ASIO_DISABLE_THREAD_KEYWORD_EXTENSION",
             opt_variant,
             opt_arch,
             opt_runtime,
@@ -177,7 +177,7 @@ def script(ctx):
         ]
         + opt_dirs
         + opt_libs
-        + ['install', '--prefix=' + prefix_dir]
+        + ["install", "--prefix=" + prefix_dir]
     )
 
     if ctx.is_windows():
@@ -189,11 +189,11 @@ def script(ctx):
         raise RuntimeError("ERROR: b2")
 
     out_path = ctx.make_out_path()
-    ctx.copy_binary_artifacts_from_build(os.path.join(prefix_dir, 'lib'), out_path)
+    ctx.copy_binary_artifacts_from_build(os.path.join(prefix_dir, "lib"), out_path)
 
     shutil.copytree(
-        os.path.join(prefix_dir, 'include', 'boost'),
-        os.path.join(boost_dir, 'include', 'boost'),
+        os.path.join(prefix_dir, "include", "boost"),
+        os.path.join(boost_dir, "include", "boost"),
         dirs_exist_ok=True,
     )
 

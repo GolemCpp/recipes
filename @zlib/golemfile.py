@@ -5,9 +5,9 @@ import subprocess
 
 def configure(project):
     def target_decorator(target_name, config, context):
-        if context.compiler_name() == 'msvc':
+        if context.compiler_name() == "msvc":
             result = target_name
-            result += 'libstat' if context.is_static() else 'libwapi'
+            result += "libstat" if context.is_static() else "libwapi"
             return result
         return target_name
 
@@ -16,23 +16,23 @@ def configure(project):
         for suffix in context.artifact_suffix(config):
             artifact = context.artifact_prefix(config) + decorated_target + suffix
             artifacts.append(artifact)
-            if suffix == '.so':
-                artifacts.append('{}.{}'.format(artifact, context.version.major))
+            if suffix == ".so":
+                artifacts.append("{}.{}".format(artifact, context.version.major))
                 artifacts.append(
-                    '{}.{}.{}.{}'.format(
+                    "{}.{}.{}.{}".format(
                         artifact,
                         context.version.major,
                         context.version.minor,
                         context.version.patch,
                     )
                 )
-            elif suffix == '.dylib':
+            elif suffix == ".dylib":
                 basename_prefix = context.artifact_prefix(config) + decorated_target
                 artifacts.append(
-                    '{}.{}.dylib'.format(basename_prefix, context.version.major)
+                    "{}.{}.dylib".format(basename_prefix, context.version.major)
                 )
                 artifacts.append(
-                    '{}.{}.{}.{}.dylib'.format(
+                    "{}.{}.{}.{}.dylib".format(
                         basename_prefix,
                         context.version.major,
                         context.version.minor,
@@ -42,16 +42,16 @@ def configure(project):
         return artifacts
 
     project.library(
-        name='zlib',
-        targets=['z'],
+        name="zlib",
+        targets=["z"],
         scripts=[script],
         target_decorators=[target_decorator],
         artifacts_generators=[artifacts_generator],
     )
 
-    target = project.export(name='zlib', includes=['include'], licenses=['README'])
+    target = project.export(name="zlib", includes=["include"], licenses=["README"])
 
-    target.when(osystem=['windows'], link=['shared'], defines=['ZLIB_WINAPI'])
+    target.when(osystem=["windows"], link=["shared"], defines=["ZLIB_WINAPI"])
 
 
 def build_msvc(ctx):
@@ -62,22 +62,22 @@ def build_msvc(ctx):
     if not os.path.exists(build_dir):
         os.makedirs(build_dir)
 
-    project_path = os.path.join(repo_dir, 'contrib', 'vstudio', 'vc14')
+    project_path = os.path.join(repo_dir, "contrib", "vstudio", "vc14")
     build_path = project_path
 
     if ctx.is_static():
-        project_path = os.path.join(project_path, 'zlibstat.vcxproj')
+        project_path = os.path.join(project_path, "zlibstat.vcxproj")
         build_path = os.path.join(
             build_path,
             ctx.vs_platform(),
-            'ZlibStat' + ('Release' if ctx.is_release() else 'Debug'),
+            "ZlibStat" + ("Release" if ctx.is_release() else "Debug"),
         )
     else:
-        project_path = os.path.join(project_path, 'zlibvc.vcxproj')
+        project_path = os.path.join(project_path, "zlibvc.vcxproj")
         build_path = os.path.join(
             build_path,
             ctx.vs_platform(),
-            'ZlibDll' + ('Release' if ctx.is_release() else 'Debug'),
+            "ZlibDll" + ("Release" if ctx.is_release() else "Debug"),
         )
 
     ctx.run_msbuild_command(project_path=project_path)
@@ -94,11 +94,11 @@ def build_gcc(ctx):
     if not os.path.exists(build_dir):
         os.makedirs(build_dir)
 
-    ret = subprocess.call(['./configure'], cwd=repo_dir)
+    ret = subprocess.call(["./configure"], cwd=repo_dir)
     if ret:
         raise RuntimeError("ERROR: configure")
 
-    ret = subprocess.call(['make'], cwd=repo_dir)
+    ret = subprocess.call(["make"], cwd=repo_dir)
     if ret:
         raise RuntimeError("ERROR: make")
 
@@ -108,17 +108,17 @@ def build_gcc(ctx):
 
 def script(ctx):
 
-    if ctx.compiler_name() == 'msvc':
+    if ctx.compiler_name() == "msvc":
         build_msvc(ctx)
     else:
         build_gcc(ctx)
 
     repo_dir = ctx.get_project_dir()
 
-    include_dir = os.path.join(repo_dir, 'include')
+    include_dir = os.path.join(repo_dir, "include")
     if os.path.exists(include_dir):
         shutil.rmtree(include_dir)
     os.makedirs(include_dir)
 
-    shutil.copy(os.path.join(repo_dir, 'zlib.h'), include_dir)
-    shutil.copy(os.path.join(repo_dir, 'zconf.h'), include_dir)
+    shutil.copy(os.path.join(repo_dir, "zlib.h"), include_dir)
+    shutil.copy(os.path.join(repo_dir, "zconf.h"), include_dir)

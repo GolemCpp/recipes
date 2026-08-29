@@ -1,10 +1,6 @@
 # This cookbook is not a package. The file is here because black and ruff read
 # their settings from it, and both should say the same as they do in golem.
 
-[tool.black]
-# Strings here are single-quoted, for now.
-skip-string-normalization = true
-
 [tool.ruff]
 line-length = 88
 
