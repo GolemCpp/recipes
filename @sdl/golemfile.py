@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-
-
 def configure(project):
 
     target = project.export(name='sdl2',

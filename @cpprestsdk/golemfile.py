@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 def configure(project):
 
     project.dependency(name='zlib',

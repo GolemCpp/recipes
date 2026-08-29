@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from tempfile import mkstemp
 import os
 from os import fdopen, remove
