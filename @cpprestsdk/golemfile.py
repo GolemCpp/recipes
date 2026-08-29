@@ -1,55 +1,69 @@
 def configure(project):
 
-    project.dependency(name='zlib',
-                       location='@zlib',
-                       version='*',
-                       variant="release",
-                       shallow=True)
+    project.dependency(
+        name='zlib', location='@zlib', version='*', variant="release", shallow=True
+    )
 
-    project.dependency(name='boost',
-                       targets=[
-                           "boost_system", "boost_filesystem", "boost_locale",
-                           "boost_chrono", "boost_thread", "boost_random",
-                           "boost_atomic", "boost_date_time", "boost_regex"
-                       ],
-                       location='@boost',
-                       version='*',
-                       variant='release',
-                       shallow=True)
+    project.dependency(
+        name='boost',
+        targets=[
+            "boost_system",
+            "boost_filesystem",
+            "boost_locale",
+            "boost_chrono",
+            "boost_thread",
+            "boost_random",
+            "boost_atomic",
+            "boost_date_time",
+            "boost_regex",
+        ],
+        location='@boost',
+        version='*',
+        variant='release',
+        shallow=True,
+    )
 
-    project.dependency(name='openssl',
-                       location='@openssl',
-                       version='*',
-                       variant="release",
-                       shallow=True)
+    project.dependency(
+        name='openssl',
+        location='@openssl',
+        version='*',
+        variant="release",
+        shallow=True,
+    )
 
     def artifacts_generator(decorated_target, config, context):
         artifacts = []
         for suffix in context.artifact_suffix(config):
-            artifact = context.artifact_prefix(
-                config) + decorated_target + suffix
+            artifact = context.artifact_prefix(config) + decorated_target + suffix
             artifacts.append(artifact)
             if suffix == '.so':
-                artifacts.append('{}.{}.{}'.format(artifact,
-                                                   context.version.major,
-                                                   context.version.minor))
+                artifacts.append(
+                    '{}.{}.{}'.format(
+                        artifact, context.version.major, context.version.minor
+                    )
+                )
             elif suffix == '.dylib':
-                basename_prefix = context.artifact_prefix(
-                    config) + decorated_target
-                artifacts.append('{}.{}.{}.dylib'.format(
-                    basename_prefix, context.version.major,
-                    context.version.minor))
+                basename_prefix = context.artifact_prefix(config) + decorated_target
+                artifacts.append(
+                    '{}.{}.{}.dylib'.format(
+                        basename_prefix, context.version.major, context.version.minor
+                    )
+                )
         return artifacts
 
-    project.library(name='cpprest',
-                    deps=['boost', 'openssl', 'zlib'],
-                    scripts=[script],
-                    artifacts_generators=[artifacts_generator])
+    project.library(
+        name='cpprest',
+        deps=['boost', 'openssl', 'zlib'],
+        scripts=[script],
+        artifacts_generators=[artifacts_generator],
+    )
 
-    project.export(name='cpprest',
-                   includes=['Release/include'],
-                   licenses=['license.txt', 'ThirdPartyNotices.txt'],
-                   deps=['boost', 'openssl', 'zlib'])
+    project.export(
+        name='cpprest',
+        includes=['Release/include'],
+        licenses=['license.txt', 'ThirdPartyNotices.txt'],
+        deps=['boost', 'openssl', 'zlib'],
+    )
 
 
 import os
@@ -84,31 +98,40 @@ def script(ctx):
 
     opt_deps = []
 
-    zlib_libs = ctx.find_dependency_libraries_files(dep_name='zlib',
-                                                    target_name='z')
-    crypto_libs = ctx.find_dependency_libraries_files(dep_name='openssl',
-                                                      target_name='crypto')
-    ssl_libs = ctx.find_dependency_libraries_files(dep_name='openssl',
-                                                   target_name='ssl')
+    zlib_libs = ctx.find_dependency_libraries_files(dep_name='zlib', target_name='z')
+    crypto_libs = ctx.find_dependency_libraries_files(
+        dep_name='openssl', target_name='crypto'
+    )
+    ssl_libs = ctx.find_dependency_libraries_files(
+        dep_name='openssl', target_name='ssl'
+    )
     ssl_libraries = ssl_libs[0] + ";" + crypto_libs[0]
 
     opt_deps += [
         '-DBOOST_LIBRARYDIR=' + ctx.find_dependency_libraries('boost')[0],
         '-DBOOST_INCLUDEDIR=' + ctx.find_dependency_includes('boost')[0],
-        '-DBoost_NO_SYSTEM_PATHS=ON', '-DZLIB_LIBRARY=' + zlib_libs[0],
+        '-DBoost_NO_SYSTEM_PATHS=ON',
+        '-DZLIB_LIBRARY=' + zlib_libs[0],
         '-DZLIB_INCLUDE_DIR=' + ctx.find_dependency_includes('zlib')[0],
         '-DOPENSSL_LIBRARIES=' + ssl_libraries,
         '-DOPENSSL_ROOT_DIR=' + ctx.find_dependency_libraries('openssl')[0],
         '-DOPENSSL_CRYPTO_LIBRARY=' + crypto_libs[0],
         '-DOPENSSL_SSL_LIBRARY=' + ssl_libs[0],
         '-DOPENSSL_INCLUDE_DIR=' + ctx.find_dependency_includes('openssl')[0],
-        '-DWERROR=OFF'
+        '-DWERROR=OFF',
     ]
 
-    command = ['cmake', cpprest_dir] + opt_arch + [
-        opt_variant, opt_target, '-DCPPREST_EXCLUDE_WEBSOCKETS=1',
-        '-DCPPREST_ABI_TAG='
-    ] + opt_deps
+    command = (
+        ['cmake', cpprest_dir]
+        + opt_arch
+        + [
+            opt_variant,
+            opt_target,
+            '-DCPPREST_EXCLUDE_WEBSOCKETS=1',
+            '-DCPPREST_ABI_TAG=',
+        ]
+        + opt_deps
+    )
 
     print(' '.join(command))
 
@@ -118,7 +141,8 @@ def script(ctx):
 
     ret = subprocess.call(
         ['cmake', '--build', '.', '--target', 'cpprest', '--config', variant],
-        cwd=target_dir)
+        cwd=target_dir,
+    )
     if ret:
         raise RuntimeError("ERROR: cmake --build")
 

@@ -15,36 +15,44 @@ def configure(project):
     def artifacts_generator(decorated_target, config, context):
         artifacts = []
         for suffix in context.artifact_suffix(config):
-            artifact = context.artifact_prefix(
-                config) + decorated_target + suffix
+            artifact = context.artifact_prefix(config) + decorated_target + suffix
             artifacts.append(artifact)
             if suffix == '.so':
                 artifacts.append('{}.{}'.format(artifact, '_noabi'))
-                artifacts.append('{}.{}.{}.{}'.format(artifact,
-                                                      context.version.major,
-                                                      context.version.minor,
-                                                      context.version.patch))
+                artifacts.append(
+                    '{}.{}.{}.{}'.format(
+                        artifact,
+                        context.version.major,
+                        context.version.minor,
+                        context.version.patch,
+                    )
+                )
         return artifacts
 
     project.dependency(
         name='mongo-c-driver',
         location='@mongo-c-driver',
         version='*',
-        variant='release')
+        variant='release',
+    )
 
-    target = project.library(name='mongo-cxx-driver',
-                             targets=['bsoncxx', 'mongocxx'],
-                             scripts=[script],
-                             artifacts_generators=[artifacts_generator],
-                             deps=['mongo-c-driver'])
+    target = project.library(
+        name='mongo-cxx-driver',
+        targets=['bsoncxx', 'mongocxx'],
+        scripts=[script],
+        artifacts_generators=[artifacts_generator],
+        deps=['mongo-c-driver'],
+    )
 
     target.when(link=['shared'], target_decorators=[shared_targets_decorator])
     target.when(link=['static'], target_decorators=[static_targets_decorator])
 
-    target = project.export(name='mongo-cxx-driver',
-                            includes=['include'],
-                            licenses=['LICENSE', 'THIRD-PARTY-NOTICES'],
-                            deps=['mongo-c-driver'])
+    target = project.export(
+        name='mongo-cxx-driver',
+        includes=['include'],
+        licenses=['LICENSE', 'THIRD-PARTY-NOTICES'],
+        deps=['mongo-c-driver'],
+    )
 
     target.when(link=['static'], defines=['MONGOCXX_STATIC', 'BSONCXX_STATIC'])
 
@@ -98,17 +106,26 @@ def build_mongocxx(ctx):
 
     prefix_path_bis = '-DCMAKE_PREFIX_PATH=' + mongoc_out_path
 
-    ret = subprocess.call(['cmake', mongocxx_dir] + opt_arch + [
-        opt_variant, opt_target, '-DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF',
-        '-DENABLE_EXAMPLES=OFF', '-DENABLE_TESTS=OFF', prefix_path_bis,
-        prefix_path
-    ],
-                          cwd=target_dir)
+    ret = subprocess.call(
+        ['cmake', mongocxx_dir]
+        + opt_arch
+        + [
+            opt_variant,
+            opt_target,
+            '-DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF',
+            '-DENABLE_EXAMPLES=OFF',
+            '-DENABLE_TESTS=OFF',
+            prefix_path_bis,
+            prefix_path,
+        ],
+        cwd=target_dir,
+    )
     if ret:
         raise RuntimeError("ERROR: cmake")
 
-    ret = subprocess.call(['cmake', '--build', '.', '--config', variant],
-                          cwd=target_dir)
+    ret = subprocess.call(
+        ['cmake', '--build', '.', '--config', variant], cwd=target_dir
+    )
     if ret:
         raise RuntimeError("ERROR: cmake --build")
 
@@ -124,20 +141,21 @@ def script(ctx):
     prefix_dir = make_install_path(ctx)
 
     out_path = ctx.make_out_path()
-    ctx.copy_binary_artifacts_from_build(os.path.join(prefix_dir, 'lib'),
-                                         out_path)
+    ctx.copy_binary_artifacts_from_build(os.path.join(prefix_dir, 'lib'), out_path)
 
     include_dir = ctx.make_project_path('include')
     os.makedirs(include_dir)
 
-    shutil.copytree(os.path.join(prefix_dir, 'include', 'bsoncxx',
-                                 'v_noabi', 'bsoncxx'),
-                    os.path.join(include_dir, 'bsoncxx'),
-                    dirs_exist_ok=True,
-                    symlinks=True)
+    shutil.copytree(
+        os.path.join(prefix_dir, 'include', 'bsoncxx', 'v_noabi', 'bsoncxx'),
+        os.path.join(include_dir, 'bsoncxx'),
+        dirs_exist_ok=True,
+        symlinks=True,
+    )
 
-    shutil.copytree(os.path.join(prefix_dir, 'include', 'mongocxx',
-                                 'v_noabi', 'mongocxx'),
-                    os.path.join(include_dir, 'mongocxx'),
-                    dirs_exist_ok=True,
-                    symlinks=True)
+    shutil.copytree(
+        os.path.join(prefix_dir, 'include', 'mongocxx', 'v_noabi', 'mongocxx'),
+        os.path.join(include_dir, 'mongocxx'),
+        dirs_exist_ok=True,
+        symlinks=True,
+    )

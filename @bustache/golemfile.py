@@ -7,19 +7,20 @@ import glob
 
 def configure(project):
 
-    project.dependency(name='boost',
-                       targets=["boost_system"],
-                       location='@boost',
-                       version='*',
-                       variant='release',
-                       shallow=True)
+    project.dependency(
+        name='boost',
+        targets=["boost_system"],
+        location='@boost',
+        version='*',
+        variant='release',
+        shallow=True,
+    )
 
     project.library(name='bustache', scripts=[script], deps=['boost'])
 
-    project.export(name='bustache',
-                   includes=['include'],
-                   deps=['boost'],
-                   licenses=['README.md'])
+    project.export(
+        name='bustache', includes=['include'], deps=['boost'], licenses=['README.md']
+    )
 
 
 def script(ctx):
@@ -49,18 +50,20 @@ def script(ctx):
     boost_options = [
         '-DBOOST_LIBRARYDIR=' + ctx.find_dependency_libraries('boost')[0],
         '-DBOOST_INCLUDEDIR=' + ctx.find_dependency_includes('boost')[0],
-        '-DBoost_NO_SYSTEM_PATHS=ON'
+        '-DBoost_NO_SYSTEM_PATHS=ON',
     ]
 
-    ret = subprocess.call(['cmake', bustache_dir] + boost_options + opt_arch +
-                          [opt_variant, opt_target],
-                          cwd=target_dir)
+    ret = subprocess.call(
+        ['cmake', bustache_dir] + boost_options + opt_arch + [opt_variant, opt_target],
+        cwd=target_dir,
+    )
     if ret:
         raise RuntimeError("ERROR: cmake")
 
     ret = subprocess.call(
         ['cmake', '--build', '.', '--target', 'bustache', '--config', variant],
-        cwd=target_dir)
+        cwd=target_dir,
+    )
     if ret:
         raise RuntimeError("ERROR: cmake --build")
 

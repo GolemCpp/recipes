@@ -1,17 +1,33 @@
 def configure(project):
 
-    target = project.export(name='ffmpeg',
-                            targets=[
-                                'avcodec', 'avdevice', 'avfilter', 'avformat',
-                                'avresample', 'avutil', 'swresample', 'swscale'
-                            ],
-                            includes=['FFmpeg/output/include'])
+    target = project.export(
+        name='ffmpeg',
+        targets=[
+            'avcodec',
+            'avdevice',
+            'avfilter',
+            'avformat',
+            'avresample',
+            'avutil',
+            'swresample',
+            'swscale',
+        ],
+        includes=['FFmpeg/output/include'],
+    )
 
-    target.when(osystem=['windows'],
-                dlls=[
-                    'avcodec-57', 'avdevice-57', 'avfilter-6', 'avformat-57',
-                    'avresample-3', 'avutil-55', 'swresample-2', 'swscale-4'
-                ])
+    target.when(
+        osystem=['windows'],
+        dlls=[
+            'avcodec-57',
+            'avdevice-57',
+            'avfilter-6',
+            'avformat-57',
+            'avresample-3',
+            'avutil-55',
+            'swresample-2',
+            'swscale-4',
+        ],
+    )
 
 
 import os
@@ -24,15 +40,22 @@ from golemcpp.golem import helpers
 
 def msvc_vcvars_cmd(ctx):
     cmd = [
-        'cmd', '/c', 'vswhere', '-latest', '-products', '*', '-property',
-        'installationPath'
+        'cmd',
+        '/c',
+        'vswhere',
+        '-latest',
+        '-products',
+        '*',
+        '-property',
+        'installationPath',
     ]
     print(' '.join(cmd))
     ret = subprocess.Popen(
         cmd,
         cwd='C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer',
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
+        stderr=subprocess.PIPE,
+    )
     out, err = ret.communicate()
     if ret.returncode:
         print("ERROR: " + ' '.join(cmd))
@@ -44,8 +67,7 @@ def msvc_vcvars_cmd(ctx):
     print(msvc_path)
 
     vcvars = msvc_path + '\\VC\\Auxiliary\\Build\\vcvarsall.bat'
-    call_msvc = 'call "' + vcvars + '" ' + \
-        ctx.context.env['MSVC_TARGETS'][0] + ' && '
+    call_msvc = 'call "' + vcvars + '" ' + ctx.context.env['MSVC_TARGETS'][0] + ' && '
     print(call_msvc)
     return call_msvc
 
@@ -64,8 +86,12 @@ def script(ctx):
         opt_variant.append('--enable-debug')
 
     opt_libs = [
-        '--disable-yasm', '--disable-programs', '--disable-doc',
-        '--enable-avresample', '--enable-version3', '--prefix=output'
+        '--disable-yasm',
+        '--disable-programs',
+        '--disable-doc',
+        '--enable-avresample',
+        '--enable-version3',
+        '--prefix=output',
     ]
 
     opt_link = []
@@ -82,41 +108,38 @@ def script(ctx):
 
     # ffmpeg's own names for --arch, so the recipe spells them rather than
     # asking Golem for a vocabulary that is not Golem's.
-    opt_arch = ['--arch=' + ('amd64' if ctx.get_arch() == 'x86_64'
-                             else 'i386')]
+    opt_arch = ['--arch=' + ('amd64' if ctx.get_arch() == 'x86_64' else 'i386')]
 
     call_msvc = msvc_vcvars_cmd(ctx)
 
-    cmd = ' '.join(['./configure'] + opt_arch + opt_link + opt_variant +
-                   opt_platform + opt_libs)
+    cmd = ' '.join(
+        ['./configure'] + opt_arch + opt_link + opt_variant + opt_platform + opt_libs
+    )
     print(cmd)
     my_env = os.environ
     my_env['PATH'] = r'C:\WINDOWS\System32;C:\msys64\usr\bin'
 
-    if subprocess.call("pacman -S diffutils make --noconfirm",
-                       cwd=ffmpeg_dir,
-                       shell=True,
-                       env=my_env):
+    if subprocess.call(
+        "pacman -S diffutils make --noconfirm", cwd=ffmpeg_dir, shell=True, env=my_env
+    ):
         return 1
 
-    if subprocess.call(call_msvc + "bash -c \"" + cmd + "\"",
-                       cwd=ffmpeg_dir,
-                       shell=True,
-                       env=my_env):
+    if subprocess.call(
+        call_msvc + "bash -c \"" + cmd + "\"", cwd=ffmpeg_dir, shell=True, env=my_env
+    ):
         return 1
 
-    if subprocess.call(call_msvc + "bash -c \"make\"",
-                       cwd=ffmpeg_dir,
-                       shell=True,
-                       env=my_env):
+    if subprocess.call(
+        call_msvc + "bash -c \"make\"", cwd=ffmpeg_dir, shell=True, env=my_env
+    ):
         return 1
 
-    if subprocess.call(call_msvc + "bash -c \"make install\"",
-                       cwd=ffmpeg_dir,
-                       shell=True,
-                       env=my_env):
+    if subprocess.call(
+        call_msvc + "bash -c \"make install\"", cwd=ffmpeg_dir, shell=True, env=my_env
+    ):
         return 1
 
     out_path = ctx.make_out_path()
     ctx.copy_binary_artifacts_from_build(
-        os.path.join(ffmpeg_dir, 'output', 'bin'), out_path)
+        os.path.join(ffmpeg_dir, 'output', 'bin'), out_path
+    )

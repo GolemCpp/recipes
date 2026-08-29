@@ -1,7 +1,6 @@
 def configure(project):
 
-    target = project.export(name='sdl2',
-                            includes=[os.path.join('SDL2', 'include')])
+    target = project.export(name='sdl2', includes=[os.path.join('SDL2', 'include')])
 
     target.when(variant='debug', targets=['SDL2d'])
     target.when(variant='release', targets=['SDL2'])
@@ -37,8 +36,9 @@ def download_latest_src(ctx):
         z.extractall(sdl2_dir)
 
     for filename in os.listdir(os.path.join(sdl2_dir, name)):
-        shutil.move(os.path.join(sdl2_dir, name, filename),
-                    os.path.join(sdl2_dir, filename))
+        shutil.move(
+            os.path.join(sdl2_dir, name, filename), os.path.join(sdl2_dir, filename)
+        )
 
 
 def script(ctx):
@@ -78,30 +78,40 @@ def script(ctx):
 
     opt_arch = ['-A', ctx.vs_platform()] if ctx.is_windows() else []
 
-    print(' '.join(['cmake', sdl2_dir] + opt_arch +
-                   [opt_variant, opt_runtime_link] + opt_link))
-    ret = subprocess.call(['cmake', sdl2_dir] + opt_arch +
-                          [opt_variant, opt_runtime_link] + opt_link +
-                          ['-DEXTRA_LIBS=vcruntime'],
-                          cwd=target_dir)
+    print(
+        ' '.join(
+            ['cmake', sdl2_dir] + opt_arch + [opt_variant, opt_runtime_link] + opt_link
+        )
+    )
+    ret = subprocess.call(
+        ['cmake', sdl2_dir]
+        + opt_arch
+        + [opt_variant, opt_runtime_link]
+        + opt_link
+        + ['-DEXTRA_LIBS=vcruntime'],
+        cwd=target_dir,
+    )
     if ret:
         print("ERROR: cmake")
         return 1
 
-    ret = subprocess.call(['cmake', '--build', '.', '--config', variant_name],
-                          cwd=target_dir)
+    ret = subprocess.call(
+        ['cmake', '--build', '.', '--config', variant_name], cwd=target_dir
+    )
     if ret:
         print("ERROR: cmake --build")
         return 1
 
     out_path = ctx.make_out_path()
     ctx.copy_binary_artifacts_from_build(
-        os.path.join(target_dir, variant_name), out_path)
+        os.path.join(target_dir, variant_name), out_path
+    )
 
     include_src = os.path.join(sdl2_dir, 'include')
     include_dest = os.path.join(sdl2_dir, 'include', 'SDL2')
     for filename in os.listdir(include_src):
         if not os.path.exists(include_dest):
             os.makedirs(include_dest)
-        shutil.move(os.path.join(include_src, filename),
-                    os.path.join(include_dest, filename))
+        shutil.move(
+            os.path.join(include_src, filename), os.path.join(include_dest, filename)
+        )

@@ -25,31 +25,37 @@ def configure(project):
             artifact = context.artifact_prefix(config) + decorated_target
             if suffix in ['.dll', '.pdb']:
                 artifact = '{}-{}_{}-{}'.format(
-                    artifact, context.version.major, context.version.minor,
-                    'x64' if is_x86_64(context) else 'x86')
+                    artifact,
+                    context.version.major,
+                    context.version.minor,
+                    'x64' if is_x86_64(context) else 'x86',
+                )
             artifact += suffix
             artifacts.append(artifact)
             if suffix == '.so':
-                artifacts.append('{}.{}.{}'.format(artifact,
-                                                   context.version.major,
-                                                   context.version.minor))
+                artifacts.append(
+                    '{}.{}.{}'.format(
+                        artifact, context.version.major, context.version.minor
+                    )
+                )
             elif suffix == '.dylib':
-                basename_prefix = context.artifact_prefix(
-                    config) + decorated_target
-                artifacts.append('{}.{}.{}.dylib'.format(
-                    basename_prefix, context.version.major,
-                    context.version.minor))
+                basename_prefix = context.artifact_prefix(config) + decorated_target
+                artifacts.append(
+                    '{}.{}.{}.dylib'.format(
+                        basename_prefix, context.version.major, context.version.minor
+                    )
+                )
         return artifacts
 
-    project.library(name='openssl',
-                    targets=['crypto', 'ssl'],
-                    scripts=[script],
-                    target_decorators=[target_decorator],
-                    artifacts_generators=[artifacts_generator])
+    project.library(
+        name='openssl',
+        targets=['crypto', 'ssl'],
+        scripts=[script],
+        target_decorators=[target_decorator],
+        artifacts_generators=[artifacts_generator],
+    )
 
-    project.export(name='openssl',
-                   includes=['output/include'],
-                   licenses=['LICENSE'])
+    project.export(name='openssl', includes=['output/include'], licenses=['LICENSE'])
 
 
 def script(ctx):
@@ -106,7 +112,10 @@ def script(ctx):
         opt_libs.append('--libdir=/usr/lib')
 
     openssl_config_args = [
-        'no-asm', 'no-dynamic-engine', 'enable-static-engine', opt_variant
+        'no-asm',
+        'no-dynamic-engine',
+        'enable-static-engine',
+        opt_variant,
     ]
 
     if ctx.is_static():
@@ -114,15 +123,22 @@ def script(ctx):
 
     if ctx.is_windows():
         cmd = [
-            'cmd', '/c', 'vswhere', '-latest', '-products', '*', '-property',
-            'installationPath'
+            'cmd',
+            '/c',
+            'vswhere',
+            '-latest',
+            '-products',
+            '*',
+            '-property',
+            'installationPath',
         ]
         print(' '.join(cmd))
         ret = subprocess.Popen(
             cmd,
             cwd='C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer',
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            stderr=subprocess.PIPE,
+        )
         out, err = ret.communicate()
         if ret.returncode:
             print("ERROR: " + ' '.join(cmd))
@@ -152,8 +168,10 @@ def script(ctx):
     if ctx.is_windows():
         vcvars = msvc_path + '\\VC\\Auxiliary\\Build\\vcvarsall.bat'
         call_msvc = [
-            'call', '"' + vcvars + '"', ctx.context.env['MSVC_TARGETS'][0],
-            '&&'
+            'call',
+            '"' + vcvars + '"',
+            ctx.context.env['MSVC_TARGETS'][0],
+            '&&',
         ]
         print(call_msvc)
 
@@ -173,4 +191,5 @@ def script(ctx):
     shutil.copytree(
         os.path.join(openssl_dir, 'include', 'openssl'),
         os.path.join(openssl_dir, 'output', 'include', 'openssl'),
-        dirs_exist_ok=True)
+        dirs_exist_ok=True,
+    )

@@ -14,35 +14,42 @@ def configure(project):
     def artifacts_generator(decorated_target, config, context):
         artifacts = []
         for suffix in context.artifact_suffix(config):
-            artifact = context.artifact_prefix(
-                config) + decorated_target + suffix
+            artifact = context.artifact_prefix(config) + decorated_target + suffix
             artifacts.append(artifact)
             if suffix == '.so':
-                artifacts.append('{}.{}'.format(artifact,
-                                                context.version.major))
-                artifacts.append('{}.{}.{}.{}'.format(artifact,
-                                                      context.version.major,
-                                                      context.version.minor,
-                                                      context.version.patch))
+                artifacts.append('{}.{}'.format(artifact, context.version.major))
+                artifacts.append(
+                    '{}.{}.{}.{}'.format(
+                        artifact,
+                        context.version.major,
+                        context.version.minor,
+                        context.version.patch,
+                    )
+                )
             elif suffix == '.dylib':
-                basename_prefix = context.artifact_prefix(
-                    config) + decorated_target
-                artifacts.append('{}.{}.dylib'.format(basename_prefix,
-                                                      context.version.major))
-                artifacts.append('{}.{}.{}.{}.dylib'.format(
-                    basename_prefix, context.version.major,
-                    context.version.minor, context.version.patch))
+                basename_prefix = context.artifact_prefix(config) + decorated_target
+                artifacts.append(
+                    '{}.{}.dylib'.format(basename_prefix, context.version.major)
+                )
+                artifacts.append(
+                    '{}.{}.{}.{}.dylib'.format(
+                        basename_prefix,
+                        context.version.major,
+                        context.version.minor,
+                        context.version.patch,
+                    )
+                )
         return artifacts
 
-    project.library(name='zlib',
-                    targets=['z'],
-                    scripts=[script],
-                    target_decorators=[target_decorator],
-                    artifacts_generators=[artifacts_generator])
+    project.library(
+        name='zlib',
+        targets=['z'],
+        scripts=[script],
+        target_decorators=[target_decorator],
+        artifacts_generators=[artifacts_generator],
+    )
 
-    target = project.export(name='zlib',
-                            includes=['include'],
-                            licenses=['README'])
+    target = project.export(name='zlib', includes=['include'], licenses=['README'])
 
     target.when(osystem=['windows'], link=['shared'], defines=['ZLIB_WINAPI'])
 
@@ -61,13 +68,17 @@ def build_msvc(ctx):
     if ctx.is_static():
         project_path = os.path.join(project_path, 'zlibstat.vcxproj')
         build_path = os.path.join(
-            build_path, ctx.vs_platform(),
-            'ZlibStat' + ('Release' if ctx.is_release() else 'Debug'))
+            build_path,
+            ctx.vs_platform(),
+            'ZlibStat' + ('Release' if ctx.is_release() else 'Debug'),
+        )
     else:
         project_path = os.path.join(project_path, 'zlibvc.vcxproj')
         build_path = os.path.join(
-            build_path, ctx.vs_platform(),
-            'ZlibDll' + ('Release' if ctx.is_release() else 'Debug'))
+            build_path,
+            ctx.vs_platform(),
+            'ZlibDll' + ('Release' if ctx.is_release() else 'Debug'),
+        )
 
     ctx.run_msbuild_command(project_path=project_path)
 

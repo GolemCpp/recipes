@@ -5,18 +5,22 @@ import subprocess
 
 def configure(project):
 
-    task = project.library(name='llhttp',
-                           includes=['include'],
-                           source=['src'],
-                           defines=['LLHTTP_STRICT_MODE=1'])
+    task = project.library(
+        name='llhttp',
+        includes=['include'],
+        source=['src'],
+        defines=['LLHTTP_STRICT_MODE=1'],
+    )
 
     task.when(variant='debug', cppflags=['-O0', '-g3'])
     task.when(variant='release', cppflags=['-O3', '-g0'])
 
-    project.export(name='llhttp',
-                   includes=['include'],
-                   licenses=['LICENSE-MIT'],
-                   defines=['LLHTTP_STRICT_MODE=1'])
+    project.export(
+        name='llhttp',
+        includes=['include'],
+        licenses=['LICENSE-MIT'],
+        defines=['LLHTTP_STRICT_MODE=1'],
+    )
 
 
 """

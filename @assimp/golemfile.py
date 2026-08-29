@@ -9,23 +9,31 @@ def configure(project):
 
     target = project.export(name='assimp', includes=['include'])
 
-    target.when(variant='release',
-                osystem='linux',
-                targets=['assimp'],
-                static_targets=['IrrXML'])
-    target.when(variant='debug',
-                osystem='linux',
-                targets=['assimpd'],
-                static_targets=['IrrXMLd'])
+    target.when(
+        variant='release',
+        osystem='linux',
+        targets=['assimp'],
+        static_targets=['IrrXML'],
+    )
+    target.when(
+        variant='debug',
+        osystem='linux',
+        targets=['assimpd'],
+        static_targets=['IrrXMLd'],
+    )
 
-    target.when(variant='release',
-                osystem='windows',
-                targets=['assimp-vc140-mt'],
-                static_targets=['IrrXML', 'zlib'])
-    target.when(variant='debug',
-                osystem='windows',
-                targets=['assimp-vc140-mtd'],
-                static_targets=['IrrXMLd', 'zlibd'])
+    target.when(
+        variant='release',
+        osystem='windows',
+        targets=['assimp-vc140-mt'],
+        static_targets=['IrrXML', 'zlib'],
+    )
+    target.when(
+        variant='debug',
+        osystem='windows',
+        targets=['assimp-vc140-mtd'],
+        static_targets=['IrrXMLd', 'zlibd'],
+    )
 
 
 def script(ctx):
@@ -57,8 +65,7 @@ def script(ctx):
     opt_linux = []
     opt_linux.append('-DASSIMP_BUILD_TESTS:BOOL=OFF')
 
-    cmd = ['cmake', assimp_dir] + [opt_variant, opt_target
-                                   ] + opt_linux + opt_windows
+    cmd = ['cmake', assimp_dir] + [opt_variant, opt_target] + opt_linux + opt_windows
     print(cmd)
     ret = subprocess.call(cmd, cwd=target_dir)
     if ret:
@@ -89,9 +96,13 @@ def script(ctx):
     if ctx.is_windows():
         ctx.copy_binary_artifacts_from_build(os.path.join(zlib_path), out_path)
 
-    shutil.copytree(os.path.join(assimp_dir, 'include'),
-            os.path.join(assimp_dir, '..', 'include'),
-            dirs_exist_ok=True)
-    shutil.copytree(os.path.join(target_dir, 'include'),
-            os.path.join(assimp_dir, '..', 'include'),
-            dirs_exist_ok=True)
+    shutil.copytree(
+        os.path.join(assimp_dir, 'include'),
+        os.path.join(assimp_dir, '..', 'include'),
+        dirs_exist_ok=True,
+    )
+    shutil.copytree(
+        os.path.join(target_dir, 'include'),
+        os.path.join(assimp_dir, '..', 'include'),
+        dirs_exist_ok=True,
+    )
