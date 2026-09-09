@@ -23,23 +23,6 @@ def configure(project):
     )
 
 
-"""
-def configure(project):
-
-    task = project.library(name='llhttp', scripts=[script])
-
-    task.when(osystem='linux',
-              distribution='debian',
-              release='buster-backports',
-              packages=[],
-              packages_dev=['npm', 'node-typescript', 'node-typescript-types'])
-
-    project.export(name='llhttp',
-                   includes=['include'],
-                   licenses=['LICENSE-MIT'])
-"""
-
-
 def fix_makefile(makefile_path, is_debug):
 
     fixed_makefile_path = makefile_path + ".fixed"
