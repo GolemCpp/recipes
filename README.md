@@ -23,7 +23,7 @@ One directory per dependency, named after the [source identity](https://golemcpp
 
 The leading `@` in a recipe directory name is what tells a recipe from everything else this repository holds.
 
-The `recipe.json` says where the package is:
+The `recipe.json` says where the source is:
 
 ```json
 {
@@ -32,7 +32,7 @@ The `recipe.json` says where the package is:
 }
 ```
 
-That is what lets a project name the package instead of its URL, writing `location='@boost'`. The directory name and the locator have to agree.
+This allows a project to name a source regardless of where it comes from, instead of using a specific URL, by writing `location='@boost'`. The recipe's directory name and the locator's identity have to agree.
 
 A recipe is named at the qualification that makes it unambiguous, and no further:
 
